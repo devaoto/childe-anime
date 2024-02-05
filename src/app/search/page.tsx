@@ -6,6 +6,7 @@ import NavBar from '@/components/navbar';
 import { useEffect, useState } from 'react';
 import { Card } from 'antd';
 import Image from 'next/image';
+import { Suspense } from 'react';
 
 const { Meta } = Card;
 
@@ -42,7 +43,7 @@ interface AnimeListResponse {
   results?: Anime[];
 }
 
-export default function Search() {
+function SearchComponent() {
   const [searchResult, setSearchResult] = useState<AnimeListResponse | null>(
     null
   );
@@ -106,4 +107,10 @@ export default function Search() {
       </div>
     </div>
   );
+}
+
+export default function Search() {
+  <Suspense fallback={<div>Loading...</div>}>
+    <SearchComponent />
+  </Suspense>;
 }
