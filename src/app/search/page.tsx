@@ -110,7 +110,9 @@ function SearchComponent() {
 }
 
 export default function Search() {
-  <Suspense fallback={<div>Loading...</div>}>
-    <SearchComponent />
-  </Suspense>;
+  return (
+    <Suspense>
+      <SearchComponent />
+    </Suspense>
+  );
 }
