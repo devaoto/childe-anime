@@ -3,6 +3,27 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 const ani = new META.Anilist();
 
+const allowedGenres = [
+  'Action',
+  'Adventure',
+  'Cars',
+  'Comedy',
+  'Drama',
+  'Fantasy',
+  'Horror',
+  'Mahou Shoujo',
+  'Mecha',
+  'Music',
+  'Mystery',
+  'Psychological',
+  'Romance',
+  'Sci-Fi',
+  'Slice of Life',
+  'Sports',
+  'Supernatural',
+  'Thriller',
+];
+
 const performSearch: NextApiHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
@@ -35,7 +56,10 @@ const performSearch: NextApiHandler = async (
 
       let genreArray: string[] | undefined = getParamValue(genres)
         ?.toString()
-        .split(', ');
+        .split(', ')
+        .filter((genre) => allowedGenres.includes(genre));
+      console.log(genreArray);
+
       let typeC = getParamValue(type)?.toString().toUpperCase();
 
       if (Number.isNaN(page) || Number.isNaN(perPage)) {

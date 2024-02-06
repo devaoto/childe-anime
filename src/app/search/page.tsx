@@ -59,9 +59,12 @@ function SearchComponent() {
   useEffect(() => {
     (async () => {
       const query = searchParams?.get('q');
-      const response = await fetch(`/api/anime/search?query=${query}`, {
-        method: 'POST',
-      });
+      const response = await fetch(
+        `/api/anime/advanced-search?query=${query}`,
+        {
+          method: 'POST',
+        }
+      );
       const result = await response.json();
 
       console.log(result);

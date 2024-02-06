@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
-
 interface Anime {
   id: string;
   title: {
