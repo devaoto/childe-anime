@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@consumet/extensions": "^1.5.4",
+    "@consumet/extensions": "github:consumet/consumet.ts",
     "antd": "^5.14.0",
     "framer-motion": "^11.0.3",
     "keep-react": "^1.1.2",

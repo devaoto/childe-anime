@@ -100,7 +100,7 @@ export default function Random() {
           </Card>
         </div>
       ) : (
-        <div>Loading random randomList...</div>
+        <div>Loading random anime...</div>
       )}
     </div>
   );

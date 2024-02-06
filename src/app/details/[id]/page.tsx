@@ -291,7 +291,7 @@ export default function Details({ params }: Readonly<Props>) {
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-4 max-h-[70px] max-w-[500px] overflow-y-auto">
+          <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
             {details.episodes.map((episode, index) => (
               <div key={index}>
                 <a key={index} href={`/watch/${episode.id}/${details.id}`}>
