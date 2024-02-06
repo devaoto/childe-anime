@@ -44,11 +44,13 @@ interface AnimeListResponse {
 interface SwiperComponentProps {
   animeList: Anime[];
   isMobile: boolean;
+  includeEpisodeList?: boolean;
 }
 
 const SwiperComponent: React.FC<SwiperComponentProps> = ({
   animeList,
   isMobile,
+  includeEpisodeList = true,
 }) => {
   const router = useRouter();
   const [tooltipVisible, setTooltipVisible] = useState<boolean[]>(
@@ -127,9 +129,13 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                         : `${anime.title?.romaji}`}
                     </h1>
                   </Card.Title>
-                  <Card.Description>
-                    Total episodes: {anime?.totalEpisodes}
-                  </Card.Description>
+                  {includeEpisodeList ? (
+                    <Card.Description>
+                      Total episodes: {anime?.totalEpisodes}
+                    </Card.Description>
+                  ) : (
+                    <Card.Description>Watch now</Card.Description>
+                  )}
                 </Card.Container>
               </Card>
             )}
