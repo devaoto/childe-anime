@@ -22,7 +22,7 @@ export default function NavBar({ searchValue }: Readonly<Props>) {
       <div className="flex justify-center items-center h-16 w-full">
         <div className="pl-24 flex gap-48 ">
           <div className="flex gap-4">
-            <a href="/trending" className="text-3xl">
+            <a href="#trending" className="text-3xl">
               Trending
             </a>
             <a href="/popular" className="text-3xl">
