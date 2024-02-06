@@ -8,7 +8,11 @@ const getPopular: NextApiHandler = async (
   res: NextApiResponse
 ) => {
   try {
-    const results = await ani.fetchPopularAnime(1, 20);
+    const { page, perPage } = req.query;
+    const results = await ani.fetchPopularAnime(
+      page as number | undefined,
+      perPage as number | undefined
+    );
 
     res.status(200).json(results);
   } catch (error) {
