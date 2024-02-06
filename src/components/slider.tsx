@@ -1,10 +1,12 @@
-// SwiperComponent.tsx
-import React from 'react';
+'client';
+
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { motion } from 'framer-motion';
 import { Tooltip } from 'antd';
 import Image from 'next/image';
 import { Card } from 'keep-react';
+import { useRouter } from 'next/navigation';
 
 interface Anime {
   id?: string;
@@ -48,6 +50,22 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
   animeList,
   isMobile,
 }) => {
+  const router = useRouter();
+  const [tooltipVisible, setTooltipVisible] = useState<boolean[]>(
+    new Array(animeList.length).fill(false)
+  );
+
+  const handleCardClick = (animeId: string, index: number) => {
+    if (tooltipVisible[index]) {
+      router.push(`/details/${animeId}`);
+    } else {
+      const updatedTooltipVisible = [...tooltipVisible];
+      updatedTooltipVisible.fill(false);
+      updatedTooltipVisible[index] = true;
+      setTooltipVisible(updatedTooltipVisible);
+    }
+  };
+
   return (
     <Swiper
       slidesPerView={5}
@@ -60,63 +78,62 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
     >
       {animeList.map((anime, index) => (
         <SwiperSlide style={{ width: 'auto' }} key={index}>
-          <p
-            onDoubleClick={() =>
-              (window.location.href = `/details/${anime.id}`)
-            }
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleCardClick(anime.id as string, index)}
           >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              {isMobile ? (
-                <div>
-                  <Tooltip
-                    title={
-                      <h1 className="text-xs">
-                        {anime.title?.english
-                          ? anime.title.english
-                          : anime.title?.romaji}
-                      </h1>
-                    }
-                    placement="top"
-                  >
-                    <Image
-                      src={anime.image as string}
-                      alt={`${anime.title?.native}`}
-                      width={500}
-                      height={500}
-                      objectFit="cover"
-                      className="h-auto w-full object-cover select-none"
-                      style={{ height: 200, width: 600 }}
-                    />
-                  </Tooltip>
-                </div>
-              ) : (
-                <Card
-                  className="max-w-xs overflow-hidden rounded-md max-h-[80%] min-h-[300px] h-xs lg:w-4/5 lg:h-4/5 md:h-3/5 md:w-full"
-                  imgSrc={`${anime.image}`}
-                  imgSize={'md'}
-                  imgAlt={`${anime.title?.native}`}
+            {isMobile ? (
+              <div>
+                <Tooltip
+                  title={
+                    <h1 className="text-xs">
+                      {anime.title?.english
+                        ? anime.title.english
+                        : anime.title?.romaji}
+                    </h1>
+                  }
+                  placement="top"
+                  visible={tooltipVisible[index]}
                 >
-                  <Card.Container className="my-3">
-                    <Card.Title>
-                      <h1 className="text-[12px] lg:text-sm md:text-xs">
-                        {' '}
-                        {anime?.title?.english
-                          ? anime.title.english.length > 35
-                            ? `${anime.title.english.slice(0, 35)}...`
-                            : anime.title.english
-                          : (anime.title?.romaji?.length as number) > 35
-                          ? `${anime.title?.romaji?.slice(0, 35)}`
-                          : `${anime.title?.romaji}`}
-                      </h1>
-                    </Card.Title>
-                    <Card.Description>
-                      Total episodes: {anime?.totalEpisodes}
-                    </Card.Description>
-                  </Card.Container>
-                </Card>
-              )}
-            </motion.div>
-          </p>
+                  <Image
+                    src={anime.image as string}
+                    alt={`${anime.title?.native}`}
+                    width={500}
+                    height={500}
+                    objectFit="cover"
+                    className="h-auto w-full object-cover select-none"
+                    style={{ height: 200, width: 600 }}
+                  />
+                </Tooltip>
+              </div>
+            ) : (
+              <Card
+                className="max-w-xs overflow-hidden rounded-md max-h-[80%] min-h-[300px] h-xs lg:w-4/5 lg:h-4/5 md:h-3/5 md:w-full"
+                imgSrc={`${anime.image}`}
+                imgSize={'md'}
+                imgAlt={`${anime.title?.native}`}
+              >
+                <Card.Container className="my-3">
+                  <Card.Title>
+                    <h1 className="text-[12px] lg:text-sm md:text-xs">
+                      {' '}
+                      {anime?.title?.english
+                        ? anime.title.english.length > 35
+                          ? `${anime.title.english.slice(0, 35)}...`
+                          : anime.title.english
+                        : (anime.title?.romaji?.length as number) > 35
+                        ? `${anime.title?.romaji?.slice(0, 35)}`
+                        : `${anime.title?.romaji}`}
+                    </h1>
+                  </Card.Title>
+                  <Card.Description>
+                    Total episodes: {anime?.totalEpisodes}
+                  </Card.Description>
+                </Card.Container>
+              </Card>
+            )}
+          </motion.div>
         </SwiperSlide>
       ))}
     </Swiper>
