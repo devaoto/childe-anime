@@ -231,7 +231,7 @@ export default function Watch({ params }: Readonly<Props>) {
                 : details?.title.romaji}
             </span>
           </h1>
-          <div className="flex gap-20">
+          <div className="flex flex-col gap-20 lg:flex-row">
             <iframe
               src={data?.plyr?.main || data?.plyr?.backup}
               scrolling="no"
@@ -242,46 +242,60 @@ export default function Watch({ params }: Readonly<Props>) {
               className="lg:w-2/4 md:w-3/4 sm:w-full  rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh]"
             ></iframe>
             <div className="flex flex-wrap gap-2 mt-4 max-h-[360px] max-w-[500px] overflow-y-auto">
-              {details?.episodes.map((episode, index) => {
-                const streamId = parseInt(
-                  RegExp(/episode-(\d+)/).exec(params?.streamId)?.[1] as string,
-                  10
-                );
+              <div className="">
+                {' '}
+                {details?.episodes.map((episode, index) => {
+                  const streamId = parseInt(
+                    RegExp(/episode-(\d+)/).exec(
+                      params?.streamId
+                    )?.[1] as string,
+                    10
+                  );
 
-                return (
-                  <React.Fragment key={index}>
-                    {index + 1 !== streamId && (
-                      <a
-                        href={`/watch/${episode.id}/${details.id}`}
-                        title={details?.title?.romaji}
-                      >
-                        <button
-                          onMouseEnter={() => handleMouseEnter(index + 1)}
-                          onMouseLeave={() => handleMouseLeave(index + 1)}
-                          disabled={index + 1 > details.currentEpisode}
-                          style={buttonStyle(index + 1)}
-                          className={`border rounded-lg hover:text-gray-200 p-2 transition-colors duration-[0.3s]`}
+                  return (
+                    <React.Fragment key={index}>
+                      {index + 1 !== streamId && (
+                        <Tooltip
+                          placement="top"
+                          title={
+                            <h1 className="text-xs">
+                              {details?.title?.english
+                                ? details?.title?.english
+                                : details?.title.romaji}{' '}
+                              episode {episode.number}
+                            </h1>
+                          }
                         >
-                          Episode {index + 1}
-                        </button>
-                      </a>
-                    )}
-                    {index + 1 === streamId && (
-                      <Tooltip
-                        title={`You're already watching this`}
-                        placement="top"
-                      >
-                        <button
-                          style={unhoverButtonStyle()}
-                          className="rounded-lg  cursor-not-allowed transition-colors duration-300 max-h-[40px] px-3"
+                          <a href={`/watch/${episode.id}/${details.id}`}>
+                            <button
+                              onMouseEnter={() => handleMouseEnter(index + 1)}
+                              onMouseLeave={() => handleMouseLeave(index + 1)}
+                              disabled={index + 1 > details.currentEpisode}
+                              style={buttonStyle(index + 1)}
+                              className={`border rounded-lg hover:text-gray-200 p-2 transition-colors duration-[0.3s] mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3`}
+                            >
+                              Episode {index + 1}
+                            </button>{' '}
+                          </a>
+                        </Tooltip>
+                      )}
+                      {index + 1 === streamId && (
+                        <Tooltip
+                          title={`You're already watching this`}
+                          placement="top"
                         >
-                          Episode {index + 1}
-                        </button>
-                      </Tooltip>
-                    )}
-                  </React.Fragment>
-                );
-              })}
+                          <button
+                            style={unhoverButtonStyle()}
+                            className="rounded-lg  cursor-not-allowed transition-colors duration-300 p-2 mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                          >
+                            Episode {index + 1}
+                          </button>{' '}
+                        </Tooltip>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

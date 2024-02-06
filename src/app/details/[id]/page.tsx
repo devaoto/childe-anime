@@ -181,7 +181,7 @@ export default function Details({ params }: Readonly<Props>) {
   useEffect(() => {
     (async () => {
       const response = await fetch(
-        `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}?provider=gogoanime`
+        `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
       );
       const data = await response.json();
       setList(data);
@@ -218,6 +218,14 @@ export default function Details({ params }: Readonly<Props>) {
       : darkenHexColor(details ? details.color : 'teal', 90),
   });
 
+  const unhoverButtonStyle = (index: number) => ({
+    border: `1px solid ${details ? details.color : 'teal'}`,
+    color: `white`,
+    backgroundColor: buttonHoverStates[index]
+      ? darkenHexColor(details ? details.color : 'teal', 10)
+      : darkenHexColor(details ? details.color : 'teal', 0),
+  });
+
   return (
     <div
       style={{
@@ -227,10 +235,12 @@ export default function Details({ params }: Readonly<Props>) {
     >
       {details ? (
         <>
-          <h1 className="text-4xl mb-5">{details.title.english}</h1>
+          <h1 className="text-xl lg:text-4xl md:text-2xl sm:text-xl mb-5">
+            {details.title.english}
+          </h1>
           <div className="flex gap-5">
             <Image
-              className="rounded-md"
+              className="rounded-md max-w-[150px] max-h-[200px] lg:max-w-[300] lg:max-h-[500] md:max-w-[250px] md:max-h-[350px] sm:max-w-[150px] sm:max-h-[250px]"
               src={details.image}
               alt={details.title.native}
               width={300}
@@ -239,39 +249,49 @@ export default function Details({ params }: Readonly<Props>) {
             />
             <div className="flex flex-col">
               <p
-                className={
-                  details.description.length >= 400 ? 'text-xl' : 'text-2xl'
-                }
+                className={`${
+                  details.description.length >= 500 ? 'text-xs' : 'text-sm'
+                } md:${
+                  details.description.length >= 500 ? 'text-xs' : 'text-sm'
+                } lg:${
+                  details?.description.length >= 500 ? 'text-xl' : 'text-2xl'
+                }`}
                 dangerouslySetInnerHTML={{ __html: details.description }}
               />
-              <Button
-                type="primary"
-                shape="round"
-                size="large"
-                className="bg-cyan-500 max-w-[160px]"
-                href={`/watch/${details?.title.romaji
-                  .toLowerCase()
-                  .replace(/[^a-zA-Z0-9\s]/g, ' ')
-                  .replace(/\s+/g, '-')}-episode-1/${details.id}`}
+              <button
+                onClick={() =>
+                  (window.location.href = `/watch/${details.episodes[0].id}/${details.id}`)
+                }
+                onMouseEnter={() => handleMouseEnter(99999)}
+                onMouseLeave={() => handleMouseLeave(99999)}
+                style={unhoverButtonStyle(99999)}
+                className="border rounded-full p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
               >
-                Watch anime
-              </Button>
+                Watch now
+              </button>
             </div>
           </div>
           <div>
-            <h1 className="text-4xl">Details</h1>
-            <hr className="w-28" />
+            <h1 className="text-xl lg:text-4xl md:text-2xl sm:text-xl">
+              Details
+            </h1>
             <div className="mt-2">
               {' '}
-              <p className="text-2xl">
+              <p className="text-sm md:text-xl lg:text-2xl">
                 Studio(s): {details.studios.join(', ')}
               </p>
-              <p className="text-2xl">Rating: {details.rating}%</p>
-              <p className="text-2xl">Season: {details.season}</p>
-              <p className="text-2xl">Status: {details.status}</p>
+              <p className="text-sm md:text-xl lg:text-2xl">
+                Rating: {details.rating}%
+              </p>
+              <p className="text-sm md:text-xl lg:text-2xl">
+                Season: {details.season}
+              </p>
+              <p className="text-sm md:text-xl lg:text-2xl">
+                Status: {details.status}
+              </p>
             </div>
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4 max-h-[70px] max-w-[500px] overflow-y-auto">
             {details.episodes.map((episode, index) => (
               <div key={index}>
                 <a key={index} href={`/watch/${episode.id}/${details.id}`}>
@@ -279,7 +299,7 @@ export default function Details({ params }: Readonly<Props>) {
                     onMouseEnter={() => handleMouseEnter(index)}
                     onMouseLeave={() => handleMouseLeave(index)}
                     style={buttonStyle(index)}
-                    className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s]"
+                    className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
                   >
                     Episode {index + 1}
                   </button>
