@@ -60,7 +60,11 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
     >
       {animeList.map((anime, index) => (
         <SwiperSlide style={{ width: 'auto' }} key={index}>
-          <a href={`/details/${anime.id}`}>
+          <p
+            onDoubleClick={() =>
+              (window.location.href = `/details/${anime.id}`)
+            }
+          >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               {isMobile ? (
                 <div>
@@ -112,7 +116,7 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                 </Card>
               )}
             </motion.div>
-          </a>
+          </p>
         </SwiperSlide>
       ))}
     </Swiper>

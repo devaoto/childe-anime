@@ -119,7 +119,7 @@ function SearchComponent() {
                       alt={anime.title?.native as string}
                       height={500}
                       width={500}
-                      className="h-[150px] w-[90px] lg:h-[300px] lg:w-[150px] md:h-[250px] md:w-[100px] object-cover rounded-md"
+                      className="h-[150px] w-[90px] lg:h-[300px] lg:w-[150px] md:h-[250px] md:w-[100px] object-cover rounded-md select-none"
                     />
                   </Tooltip>
                 </a>
