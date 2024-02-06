@@ -8,6 +8,7 @@ import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import { Card } from 'keep-react';
 import { Tooltip } from 'antd';
+import SwiperComponent from './slider';
 
 SwiperCore.use([Mousewheel]);
 
@@ -78,76 +79,10 @@ export default function Trending() {
       {trendingList ? (
         <div className="container mx-auto my-8">
           <h1 className="text-3xl font-semibold mb-6">Trending Anime</h1>
-
-          <Swiper
-            slidesPerView={5}
-            spaceBetween={20}
-            mousewheel={{
-              sensitivity: 20,
-            }}
-            style={{ width: 'auto' }}
-            className="flex flex-wrap w-full gap-3"
-          >
-            {trendingList?.results?.map((anime, index) => (
-              <SwiperSlide style={{ width: 'auto' }} key={index}>
-                <a href={`/details/${anime.id}`}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {isMobile ? (
-                      <div>
-                        <Tooltip
-                          title={
-                            <h1 className="text-xs">
-                              {anime.title?.english
-                                ? anime.title.english
-                                : anime.title?.romaji}
-                            </h1>
-                          }
-                          placement="top"
-                        >
-                          <Image
-                            src={anime.image as string}
-                            alt={`${anime.title?.native}`}
-                            width={500}
-                            height={500}
-                            objectFit="cover"
-                            className="h-auto w-full object-cover"
-                          />
-                        </Tooltip>
-                      </div>
-                    ) : (
-                      <Card
-                        className="max-w-xs overflow-hidden rounded-md max-h-[80%] min-h-[300px] h-xs lg:w-4/5 lg:h-4/5 md:h-3/5 md:w-full"
-                        imgSrc={`${anime.image}`}
-                        imgSize={'md'}
-                        imgAlt={`${anime.title?.native}`}
-                      >
-                        <Card.Container className="my-3">
-                          <Card.Title>
-                            <h1 className="text-[12px] lg:text-sm md:text-xs">
-                              {' '}
-                              {anime?.title?.english
-                                ? anime.title.english.length > 35
-                                  ? `${anime.title.english.slice(0, 35)}...`
-                                  : anime.title.english
-                                : (anime.title?.romaji?.length as number) > 35
-                                ? `${anime.title?.romaji?.slice(0, 35)}`
-                                : `${anime.title?.romaji}`}
-                            </h1>
-                          </Card.Title>
-                          <Card.Description>
-                            Total episodes: {anime?.totalEpisodes}
-                          </Card.Description>
-                        </Card.Container>
-                      </Card>
-                    )}
-                  </motion.div>
-                </a>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          <SwiperComponent
+            animeList={trendingList.results || []}
+            isMobile={isMobile}
+          />
         </div>
       ) : (
         <div>Loading...</div>
