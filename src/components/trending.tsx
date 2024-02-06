@@ -1,9 +1,15 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Card } from 'antd';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
+import { motion } from 'framer-motion';
+import { Mousewheel } from 'swiper/modules';
+import 'swiper/css';
+import { Card } from 'keep-react';
+import { Tooltip } from 'antd';
 
-const { Meta } = Card;
+SwiperCore.use([Mousewheel]);
 
 interface Anime {
   id?: string;
@@ -42,48 +48,110 @@ export default function Trending() {
   const [trendingList, setTrendingList] = useState<AnimeListResponse | null>(
     null
   );
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const response = await fetch('/api/anime/trending?perPage=12');
+      const response = await fetch('/api/anime/trending?perPage=20');
       const result = await response.json();
 
       setTrendingList(result);
     })();
   }, []);
 
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 640);
+    };
+
+    checkIsMobile();
+
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
+
   return (
-    <div className="container mx-auto my-8">
-      <h1 className="text-3xl font-semibold mb-6">Trending Anime</h1>
-      <div className="flex flex-wrap w-[1400px] gap-3">
-        {trendingList?.results?.map((anime, index) => (
-          <a key={index} href={`/details/${anime.id}`}>
-            <Card
-              hoverable={true}
-              style={{ width: 200 }}
-              cover={
-                <Image
-                  src={`${anime.image}`}
-                  alt={`${anime.title?.native}`}
-                  width={200}
-                  height={300}
-                  objectFit={'cover'}
-                  className="max-h-[260px]"
-                />
-              }
-            >
-              <Meta
-                title={`${
-                  anime.title?.english
-                    ? anime.title.english
-                    : anime.title?.romaji
-                }`}
-                description={`Total Episodes: ${anime.totalEpisodes}`}
-              />
-            </Card>
-          </a>
-        ))}
-      </div>
+    <div id="trending">
+      {trendingList ? (
+        <div className="container mx-auto my-8">
+          <h1 className="text-3xl font-semibold mb-6">Trending Anime</h1>
+
+          <Swiper
+            slidesPerView={5}
+            spaceBetween={20}
+            mousewheel={{
+              sensitivity: 20,
+            }}
+            style={{ width: 'auto' }}
+            className="flex flex-wrap w-full gap-3"
+          >
+            {trendingList?.results?.map((anime, index) => (
+              <SwiperSlide style={{ width: 'auto' }} key={index}>
+                <a href={`/details/${anime.id}`}>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {isMobile ? (
+                      <div>
+                        <Tooltip
+                          title={
+                            <h1 className="text-xs">
+                              {anime.title?.english
+                                ? anime.title.english
+                                : anime.title?.romaji}
+                            </h1>
+                          }
+                          placement="top"
+                        >
+                          <Image
+                            src={anime.image as string}
+                            alt={`${anime.title?.native}`}
+                            width={500}
+                            height={500}
+                            objectFit="cover"
+                            className="h-auto w-full object-cover"
+                          />
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      <Card
+                        className="max-w-xs overflow-hidden rounded-md max-h-[80%] min-h-[300px] h-xs lg:w-4/5 lg:h-4/5 md:h-3/5 md:w-full"
+                        imgSrc={`${anime.image}`}
+                        imgSize={'md'}
+                        imgAlt={`${anime.title?.native}`}
+                      >
+                        <Card.Container className="my-3">
+                          <Card.Title>
+                            <h1 className="text-[12px] lg:text-sm md:text-xs">
+                              {' '}
+                              {anime?.title?.english
+                                ? anime.title.english.length > 35
+                                  ? `${anime.title.english.slice(0, 35)}...`
+                                  : anime.title.english
+                                : (anime.title?.romaji?.length as number) > 35
+                                ? `${anime.title?.romaji?.slice(0, 35)}`
+                                : `${anime.title?.romaji}`}
+                            </h1>
+                          </Card.Title>
+                          <Card.Description>
+                            Total episodes: {anime?.totalEpisodes}
+                          </Card.Description>
+                        </Card.Container>
+                      </Card>
+                    )}
+                  </motion.div>
+                </a>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      ) : (
+        <div>Loading...</div>
+      )}
     </div>
   );
 }
