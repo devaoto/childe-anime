@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Button } from 'antd';
+import { Badge } from 'keep-react';
+import { Tooltip } from 'antd';
 
 interface Anime {
   id: string;
@@ -159,6 +160,11 @@ function darkenHexColor(hex: string, percent: number) {
   return darkenedHex;
 }
 
+const getColorTypeByIndex = (index: number): string => {
+  const colorTypes = ['gray', 'success', 'warning', 'error', 'info'];
+  return colorTypes[index % colorTypes.length];
+};
+
 export default function Details({ params }: Readonly<Props>) {
   const [details, setDetails] = useState<Anime | null>(null);
   const [buttonHoverStates, setButtonHoverStates] = useState<{
@@ -167,25 +173,21 @@ export default function Details({ params }: Readonly<Props>) {
   const [list, setList] = useState<any>(null);
 
   useEffect(() => {
-    (async () => {
-      const response = await fetch(
-        `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
-      );
-      const result = await response.json();
-      console.log('Result', result);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
+        );
+        const data = await response.json();
+        console.log('Result', data);
+        setDetails(data);
+        setList(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-      setDetails(result);
-    })();
-  }, [params.id]);
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(
-        `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
-      );
-      const data = await response.json();
-      setList(data);
-    })();
+    fetchData();
   }, [params.id]);
 
   const episodeRanges = useMemo(() => {
@@ -289,21 +291,56 @@ export default function Details({ params }: Readonly<Props>) {
               <p className="text-sm md:text-xl lg:text-2xl">
                 Status: {details.status}
               </p>
+              <div className="flex flex-row gap-2 text-xl">
+                {details.genres.map((genre, index) => {
+                  const randomColorType = getColorTypeByIndex(index);
+                  return (
+                    <Tooltip
+                      title={`Search for ${genre}`}
+                      placement="top"
+                      key={index}
+                    >
+                      <a key={index} href={`/search?genres=${genre}`}>
+                        <Badge
+                          size={'xs'}
+                          colorType="strong"
+                          color={randomColorType}
+                        >
+                          {genre}
+                        </Badge>
+                      </a>
+                    </Tooltip>
+                  );
+                })}
+              </div>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
             {details.episodes.map((episode, index) => (
               <div key={index}>
-                <a key={index} href={`/watch/${episode.id}/${details.id}`}>
-                  <button
-                    onMouseEnter={() => handleMouseEnter(index)}
-                    onMouseLeave={() => handleMouseLeave(index)}
-                    style={buttonStyle(index)}
-                    className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
-                  >
-                    Episode {index + 1}
-                  </button>
-                </a>
+                <Tooltip
+                  title={
+                    <h1 className="text-xs">
+                      Watch{' '}
+                      {details.title.english
+                        ? details.title?.english
+                        : details?.title.romaji}{' '}
+                      episode {index + 1}
+                    </h1>
+                  }
+                  placement="top"
+                >
+                  <a key={index} href={`/watch/${episode.id}/${details.id}`}>
+                    <button
+                      onMouseEnter={() => handleMouseEnter(index)}
+                      onMouseLeave={() => handleMouseLeave(index)}
+                      style={buttonStyle(index)}
+                      className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                    >
+                      Episode {index + 1}
+                    </button>
+                  </a>
+                </Tooltip>
               </div>
             ))}
           </div>
