@@ -28,7 +28,7 @@ const performSearch: NextApiHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  if (req.method === 'POST') {
+  if (req.method === 'POST' || req.method === 'GET') {
     try {
       const {
         query,
@@ -58,7 +58,10 @@ const performSearch: NextApiHandler = async (
         ?.toString()
         .split(', ')
         .filter((genre) => allowedGenres.includes(genre));
-      console.log(genreArray);
+
+      if (genreArray?.length === 0) {
+        genreArray = undefined;
+      }
 
       let typeC = getParamValue(type)?.toString().toUpperCase();
 
@@ -68,8 +71,15 @@ const performSearch: NextApiHandler = async (
             'Required number for the parameters which requires a number.',
         });
       }
+
+      let q = getParamValue(query);
+
+      if (q === 'null') {
+        q = undefined;
+      }
+
       const results = await ani.advancedSearch(
-        getParamValue(query) as string | undefined,
+        q as string | undefined,
         typeC,
         Number(page),
         Number(perPage),
@@ -93,7 +103,7 @@ const performSearch: NextApiHandler = async (
   } else {
     return res.status(500).json({
       message: `Method ${req.method} is not allowed for this route.`,
-      allowedMethod: 'POST',
+      allowedMethods: ['POST', 'GET'],
     });
   }
 };

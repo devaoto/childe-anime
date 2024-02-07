@@ -58,9 +58,23 @@ function SearchComponent() {
 
   useEffect(() => {
     (async () => {
-      const query = searchParams?.get('q');
+      let genres: string | null | undefined;
+      let query: string | undefined;
+
+      query = searchParams?.get('q') as string | undefined;
+
+      if (searchParams?.get('genres')) {
+        genres = searchParams?.get('genres');
+      } else {
+        genres = undefined;
+      }
+
+      if (query === null) {
+        query === undefined;
+      }
+
       const response = await fetch(
-        `/api/anime/advanced-search?query=${query}`,
+        `/api/anime/advanced-search?query=${query}&genres=${genres}`,
         {
           method: 'POST',
         }
