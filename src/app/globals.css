@@ -24,7 +24,7 @@ html {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: rgb(0, 10, 10);
+  background-color: rgb(0, 12, 12);
 }
 
 @layer utilities {
