@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Childe Anime Streaming Site
 
-## Getting Started
+Welcome to Childe Anime, your personal anime streaming site! This open-source project allows you to watch anime without any ads for free, and you have the flexibility to self-host and modify it according to your needs. Feel free to contribute and enhance the platform to make it even better.
 
-First, run the development server:
+## Tech Stacks
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Childe Anime is built using the following technologies:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Node**: A JavaScript runtime for server-side.
+- **React**: A powerful frontend framework.
+- **Next**: A framework based on React that simplifies the development of server-rendered React applications.
+- **Tailwind CSS**: A utility-first CSS framework that helps in building modern and responsive user interfaces.
+- **AntDesign**: An UI Design library based on React, providing a set of high-quality React components.
+- **Keep-React**: A Tailwind CSS and React based UI Design library, offering additional components and styles.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## APIs
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Childe Anime relies on the Consumet API, an open-source API designed to fetch anime information, streaming links, and more.
 
-## Learn More
+## How to Host It Yourself
 
-To learn more about Next.js, take a look at the following resources:
+To host Childe Anime on your own server, follow these steps:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the Repository:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+   ```bash
+   git clone git@github.com:codeblitz97/childe-anime.git
+   ```
 
-## Deploy on Vercel
+2. **Install Packages:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   yarn install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+3. **Run in Development Mode:**
+
+   ```bash
+   yarn run dev
+   ```
+
+   Or, if you prefer to build and then start in production mode:
+
+   ```bash
+   # Build
+   yarn run build
+   # Start in production mode
+   yarn run start
+   ```
+
+Now, Childe Anime should be up and running on your local server. Access it through your browser and enjoy a seamless anime streaming experience without any ads!
+
+## Contribution
+
+Childe Anime is an open-source project, and we welcome contributions from the community. If you have ideas for improvements or want to report issues, feel free to create a pull request or submit an issue on the [GitHub repository](https://github.com/codeblitz97/childe-anime).
+
+Happy streaming! 🍿🎉
