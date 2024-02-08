@@ -4,6 +4,7 @@ import { Input, Tooltip } from 'antd';
 import { useEffect, useState, Suspense } from 'react';
 import Image from 'next/image';
 import NavBar from '@/components/navbar';
+import { Pagination } from 'keep-react';
 
 interface Anime {
   id?: string;
@@ -24,6 +25,8 @@ function SearchComponent() {
   const [searchResult, setSearchResult] = useState<AnimeListResponse | null>(
     null
   );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -32,7 +35,7 @@ function SearchComponent() {
         const query = searchParams?.get('q') ?? undefined;
         const genres = searchParams?.get('genres') ?? undefined;
 
-        let url = `/api/anime/advanced-search?page=1&perPage=20`;
+        let url = `/api/anime/advanced-search?page=${currentPage}&perPage=20`;
         if (query) {
           url += `&q=${query}`;
         }
@@ -43,6 +46,7 @@ function SearchComponent() {
         const response = await fetch(url);
         const result = await response.json();
         setSearchResult(result);
+        setTotalPages(result?.totalPages || 0);
       } catch (error) {
         console.error('Error fetching search results:', error);
         setSearchResult(null);
@@ -50,7 +54,11 @@ function SearchComponent() {
     };
 
     fetchData();
-  }, [searchParams]);
+  }, [searchParams, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div>
@@ -93,6 +101,18 @@ function SearchComponent() {
                 </a>
               );
             })}
+            {searchResult && searchResult?.results && (
+              <div className="flex justify-center items-center w-full mt-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  iconWithOutText={true}
+                  prevNextShape="none"
+                  showGoToPaginate={false}
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div>Loading...</div>
