@@ -4,6 +4,7 @@ import SwiperCore from 'swiper';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import SwiperComponent from './slider';
+import { Skeleton } from 'keep-react';
 
 SwiperCore.use([Mousewheel]);
 
@@ -80,7 +81,34 @@ export default function Popular() {
           />
         </div>
       ) : (
-        <div>Loading popular anime...</div>
+        <div>
+          <Skeleton animation className="ml-5">
+            <div className="w-[180px]">
+              <Skeleton.Line height="h-[30px]" />
+            </div>
+
+            <div className="flex gap-10">
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+            </div>
+          </Skeleton>
+        </div>
       )}
     </div>
   );

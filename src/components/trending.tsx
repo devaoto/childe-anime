@@ -1,14 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
-import { motion } from 'framer-motion';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
-import { Card } from 'keep-react';
-import { Tooltip } from 'antd';
 import SwiperComponent from './slider';
+import { Skeleton } from 'keep-react';
 
 SwiperCore.use([Mousewheel]);
 
@@ -85,7 +81,34 @@ export default function Trending() {
           />
         </div>
       ) : (
-        <div>Loading...</div>
+        <div>
+          <Skeleton animation className="ml-5">
+            <div className="w-[200px]">
+              <Skeleton.Line height="h-[30px]" />
+            </div>
+
+            <div className="flex gap-10">
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+              <div className="w-[200px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+            </div>
+          </Skeleton>
+        </div>
       )}
     </div>
   );

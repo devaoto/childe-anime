@@ -4,7 +4,7 @@ import SwiperCore from 'swiper';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import SwiperComponent from './slider';
-import { Card } from 'keep-react';
+import { Card, Skeleton } from 'keep-react';
 
 SwiperCore.use([Mousewheel]);
 
@@ -100,7 +100,19 @@ export default function Random() {
           </Card>
         </div>
       ) : (
-        <div>Loading random anime...</div>
+        <div>
+          <Skeleton animation className="ml-5">
+            <div className="w-[250px]">
+              <Skeleton.Line height="h-[30px]" />
+            </div>
+
+            <div className="flex gap-10">
+              <div className="w-[500px]">
+                <Skeleton.Line height="max-h-[80%] min-h-[300px] h-xs lg:h-4/5 md:h-3/5" />
+              </div>
+            </div>
+          </Skeleton>
+        </div>
       )}
     </div>
   );

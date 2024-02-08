@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Trending from '../components/trending';
 import NavBar from '@/components/navbar';
 import Recent from '@/components/recent';
