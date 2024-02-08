@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Badge } from 'keep-react';
 import { Tooltip } from 'antd';
@@ -160,17 +160,11 @@ function darkenHexColor(hex: string, percent: number) {
   return darkenedHex;
 }
 
-const getColorTypeByIndex = (index: number): string => {
-  const colorTypes = ['gray', 'success', 'warning', 'error', 'info'];
-  return colorTypes[index % colorTypes.length];
-};
-
 export default function Details({ params }: Readonly<Props>) {
   const [details, setDetails] = useState<Anime | null>(null);
   const [buttonHoverStates, setButtonHoverStates] = useState<{
     [key: string]: boolean;
   }>({});
-  const [list, setList] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,7 +175,6 @@ export default function Details({ params }: Readonly<Props>) {
         const data = await response.json();
         console.log('Result', data);
         setDetails(data);
-        setList(data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -189,20 +182,6 @@ export default function Details({ params }: Readonly<Props>) {
 
     fetchData();
   }, [params.id]);
-
-  const episodeRanges = useMemo(() => {
-    const numEpisodes = list?.length;
-    const rangeCount = Math.ceil(numEpisodes / 100);
-    const ranges = [];
-
-    for (let i = 0; i < rangeCount; i++) {
-      const start = i * 100 + 1;
-      const end = Math.min((i + 1) * 100, numEpisodes);
-      ranges.push(`${start}-${end}`);
-    }
-
-    return ranges;
-  }, [list]);
 
   const handleMouseEnter = (index: number) => {
     setButtonHoverStates((prevState) => ({ ...prevState, [index]: true }));
@@ -212,21 +191,35 @@ export default function Details({ params }: Readonly<Props>) {
     setButtonHoverStates((prevState) => ({ ...prevState, [index]: false }));
   };
 
-  const buttonStyle = (index: number) => ({
-    border: `1px solid ${details ? details.color : 'teal'}`,
-    color: `${details ? details.color : 'teal'}`,
-    backgroundColor: buttonHoverStates[index]
-      ? darkenHexColor(details ? details.color : 'teal', 60)
-      : darkenHexColor(details ? details.color : 'teal', 90),
-  });
+  const getColorTypeByGenre = (genre: string): string => {
+    const colorTypes = ['gray', 'success', 'warning', 'error', 'info'];
+    const genreIndex = details?.genres.indexOf(genre);
+    return colorTypes[(genreIndex as number) % colorTypes.length];
+  };
 
-  const unhoverButtonStyle = (index: number) => ({
-    border: `1px solid ${details ? details.color : 'teal'}`,
-    color: `white`,
-    backgroundColor: buttonHoverStates[index]
-      ? darkenHexColor(details ? details.color : 'teal', 10)
-      : darkenHexColor(details ? details.color : 'teal', 0),
-  });
+  const buttonStyle = (index: number) => {
+    const borderColor = details ? details.color : 'teal';
+    const baseColor = darkenHexColor(borderColor, 90);
+    const hoverColor = darkenHexColor(borderColor, 60);
+
+    return {
+      border: `1px solid ${borderColor}`,
+      color: 'white',
+      backgroundColor: buttonHoverStates[index] ? hoverColor : baseColor,
+    };
+  };
+
+  const unhoverButtonStyle = (index: number) => {
+    const borderColor = details ? details.color : 'teal';
+    const baseColor = darkenHexColor(borderColor, 0);
+    const hoverColor = darkenHexColor(borderColor, 10);
+
+    return {
+      border: `1px solid ${borderColor}`,
+      color: 'white',
+      backgroundColor: buttonHoverStates[index] ? hoverColor : baseColor,
+    };
+  };
 
   return (
     <div
@@ -292,15 +285,15 @@ export default function Details({ params }: Readonly<Props>) {
                 Status: {details.status}
               </p>
               <div className="flex flex-row gap-2 text-xl">
-                {details.genres.map((genre, index) => {
-                  const randomColorType = getColorTypeByIndex(index);
+                {details.genres.map((genre) => {
+                  const randomColorType = getColorTypeByGenre(genre);
                   return (
                     <Tooltip
                       title={`Search for ${genre}`}
                       placement="top"
-                      key={index}
+                      key={genre}
                     >
-                      <a key={index} href={`/search?genres=${genre}`}>
+                      <a href={`/search?genres=${genre}`}>
                         <Badge
                           size={'xs'}
                           colorType="strong"
@@ -317,7 +310,7 @@ export default function Details({ params }: Readonly<Props>) {
           </div>
           <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
             {details.episodes.map((episode, index) => (
-              <div key={index}>
+              <div key={episode.id}>
                 <Tooltip
                   title={
                     <h1 className="text-xs">
@@ -330,7 +323,10 @@ export default function Details({ params }: Readonly<Props>) {
                   }
                   placement="top"
                 >
-                  <a key={index} href={`/watch/${episode.id}/${details.id}`}>
+                  <a
+                    key={episode.id}
+                    href={`/watch/${episode.id}/${details.id}`}
+                  >
                     <button
                       onMouseEnter={() => handleMouseEnter(index)}
                       onMouseLeave={() => handleMouseLeave(index)}
