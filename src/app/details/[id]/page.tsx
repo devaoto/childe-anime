@@ -198,7 +198,7 @@ export default function Details({ params }: Readonly<Props>) {
   };
 
   const buttonStyle = (index: number) => {
-    const borderColor = details ? details.color : 'teal';
+    const borderColor = details?.color ? details.color : '#008080';
     const baseColor = darkenHexColor(borderColor, 90);
     const hoverColor = darkenHexColor(borderColor, 60);
 
@@ -210,7 +210,7 @@ export default function Details({ params }: Readonly<Props>) {
   };
 
   const unhoverButtonStyle = (index: number) => {
-    const borderColor = details ? details.color : 'teal';
+    const borderColor = details?.color ? details.color : '#008080';
     const baseColor = darkenHexColor(borderColor, 0);
     const hoverColor = darkenHexColor(borderColor, 10);
 
@@ -224,7 +224,9 @@ export default function Details({ params }: Readonly<Props>) {
   return (
     <div
       style={{
-        backgroundColor: details ? darkenHexColor(details.color, 90) : 'black',
+        backgroundColor: details?.color
+          ? darkenHexColor(details.color, 90)
+          : '#000000',
       }}
       className="h-screen"
     >

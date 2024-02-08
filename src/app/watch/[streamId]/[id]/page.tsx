@@ -198,17 +198,20 @@ export default function Watch({ params }: Readonly<Props>) {
   };
 
   const buttonStyle = (index: number) => ({
-    border: `1px solid ${details ? details.color : 'teal'}`,
-    color: `${details ? details.color : 'teal'}`,
+    border: `1px solid ${details?.color ? details.color : '#008080'}`,
+    color: `${details?.color ? details.color : '#008080'}`,
     backgroundColor: buttonHoverStates[index]
-      ? darkenHexColor(details ? details.color : 'teal', 60)
-      : darkenHexColor(details ? details.color : 'teal', 90),
+      ? darkenHexColor(details?.color ? details.color : '#008080', 60)
+      : darkenHexColor(details?.color ? details.color : '#008080', 90),
   });
 
   const unhoverButtonStyle = () => ({
-    border: `1px solid ${details ? details.color : 'teal'}`,
-    color: `${details ? details.color : 'teal'}`,
-    backgroundColor: darkenHexColor(details ? details.color : 'teal', 60),
+    border: `1px solid ${details?.color ? details.color : '#008080'}`,
+    color: `${details?.color ? details.color : '#008080'}`,
+    backgroundColor: darkenHexColor(
+      details?.color ? details.color : '#008080',
+      60
+    ),
   });
 
   return (
@@ -216,9 +219,9 @@ export default function Watch({ params }: Readonly<Props>) {
       {details ? (
         <div
           style={{
-            backgroundColor: details
+            backgroundColor: details?.color
               ? darkenHexColor(details.color, 90)
-              : 'black',
+              : '#000000',
           }}
           className="h-screen"
         >
