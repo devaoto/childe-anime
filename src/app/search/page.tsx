@@ -1,23 +1,12 @@
 'use client';
-
 import { useSearchParams } from 'next/navigation';
 import { Input, Tooltip } from 'antd';
-import NavBar from '@/components/navbar';
-import { useEffect, useState } from 'react';
-import { Card } from 'keep-react';
+import { useEffect, useState, Suspense } from 'react';
 import Image from 'next/image';
-import { Suspense } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
-import { motion } from 'framer-motion';
-import { Mousewheel } from 'swiper/modules';
-import SwiperComponent from '@/components/slider';
-
-SwiperCore.use([Mousewheel]);
+import NavBar from '@/components/navbar';
 
 interface Anime {
   id?: string;
-  malId?: number;
   title?: {
     romaji?: string;
     english?: string;
@@ -25,26 +14,9 @@ interface Anime {
     userPreferred?: string;
   };
   image?: string;
-  trailer?: {
-    id?: string;
-    site?: string;
-    thumbnail?: string;
-  };
-  description?: string;
-  status?: string;
-  cover?: string;
-  rating?: number;
-  releaseDate?: number;
-  color?: string;
-  genres?: string[];
-  totalEpisodes?: number;
-  duration?: number;
-  type?: string;
 }
 
 interface AnimeListResponse {
-  currentPage?: number;
-  hasNextPage?: boolean;
   results?: Anime[];
 }
 
@@ -52,54 +24,33 @@ function SearchComponent() {
   const [searchResult, setSearchResult] = useState<AnimeListResponse | null>(
     null
   );
-  const [isMobile, setIsMobile] = useState(false);
-
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    (async () => {
-      let genres: string | null | undefined;
-      let query: string | undefined;
+    const fetchData = async () => {
+      try {
+        const query = searchParams?.get('q') ?? undefined;
+        const genres = searchParams?.get('genres') ?? undefined;
 
-      query = searchParams?.get('q') as string | undefined;
-
-      if (searchParams?.get('genres')) {
-        genres = searchParams?.get('genres');
-      } else {
-        genres = undefined;
-      }
-
-      if (query === null) {
-        query === undefined;
-      }
-
-      const response = await fetch(
-        `/api/anime/advanced-search?query=${query}&genres=${genres}`,
-        {
-          method: 'POST',
+        let url = `/api/anime/advanced-search?page=1&perPage=20`;
+        if (query) {
+          url += `&q=${query}`;
         }
-      );
-      const result = await response.json();
+        if (genres) {
+          url += `&genres=${genres}`;
+        }
 
-      console.log(result);
+        const response = await fetch(url);
+        const result = await response.json();
+        setSearchResult(result);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setSearchResult(null);
+      }
+    };
 
-      setSearchResult(result);
-    })();
+    fetchData();
   }, [searchParams]);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 640);
-    };
-
-    checkIsMobile();
-
-    window.addEventListener('resize', checkIsMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkIsMobile);
-    };
-  }, []);
 
   return (
     <div>
@@ -116,10 +67,10 @@ function SearchComponent() {
       <div>
         {searchResult ? (
           <div className="container mx-auto my-8 flex gap-5 flex-wrap">
-            {searchResult.results?.map((anime, index) => {
+            {searchResult.results?.map((anime) => {
               return (
                 <a
-                  key={index}
+                  key={anime.id}
                   href={`/details/${anime.id}`}
                   className="cursor-pointer hover:scale-105 duration-300"
                 >
