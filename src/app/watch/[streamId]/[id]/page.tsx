@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
+import Image from 'next/image';
+
 interface Anime {
   id: string;
   title: {
@@ -223,81 +225,116 @@ export default function Watch({ params }: Readonly<Props>) {
               ? darkenHexColor(details.color, 90)
               : '#000000',
           }}
-          className="h-screen"
+          className="h-full"
         >
-          <h1 className="lg:text-2xl md:text-base sm:text-sm mb-3">
-            Watching{' '}
-            <span className="font-semibold">
-              {details?.title?.english
-                ? details.title.english
-                : details?.title.romaji}
-            </span>
-          </h1>
-          <div className="flex flex-col gap-20 lg:flex-row">
-            <iframe
-              src={data?.plyr?.main || data?.plyr?.backup}
-              scrolling="no"
-              frameBorder="0"
-              allowFullScreen={true}
-              title={params.streamId}
-              allow="picture-in-picture"
-              className="lg:w-2/4 md:w-3/4 sm:w-full  rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh]"
-            ></iframe>
-            <div className="flex flex-wrap gap-2 mt-4 max-h-[360px] max-w-[500px] overflow-y-auto">
-              <div className="">
-                {' '}
-                {details?.episodes.map((episode, index) => {
-                  const streamId = parseInt(
-                    RegExp(/episode-(\d+)/).exec(
-                      params?.streamId
-                    )?.[1] as string,
-                    10
-                  );
+          <div className="ml-2">
+            <h1 className="lg:text-2xl md:text-base sm:text-sm mb-3">
+              Watching{' '}
+              <span className="font-semibold">
+                {details?.title?.english
+                  ? details.title.english
+                  : details?.title.romaji}
+              </span>
+            </h1>
+            <div className="flex flex-col gap-20 lg:flex-row">
+              <iframe
+                src={data?.plyr?.main || data?.plyr?.backup}
+                scrolling="no"
+                frameBorder="0"
+                allowFullScreen={true}
+                title={params.streamId}
+                allow="picture-in-picture"
+                className="lg:w-2/4 md:w-3/4 sm:w-full  rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh]"
+              ></iframe>
+              <div className="flex flex-wrap gap-2 mt-4 max-h-[360px] max-w-[500px] overflow-y-auto">
+                <div className="">
+                  {' '}
+                  {details?.episodes.map((episode, index) => {
+                    const streamId = parseInt(
+                      RegExp(/episode-(\d+)/).exec(
+                        params?.streamId
+                      )?.[1] as string,
+                      10
+                    );
 
-                  return (
-                    <React.Fragment key={index}>
-                      {index + 1 !== streamId && (
-                        <Tooltip
-                          placement="top"
-                          title={
-                            <h1 className="text-xs">
-                              {details?.title?.english
-                                ? details?.title?.english
-                                : details?.title.romaji}{' '}
-                              episode {episode.number}
-                            </h1>
-                          }
-                        >
-                          <a href={`/watch/${episode.id}/${details.id}`}>
+                    return (
+                      <React.Fragment key={index}>
+                        {index + 1 !== streamId && (
+                          <Tooltip
+                            placement="top"
+                            title={
+                              <h1 className="text-xs">
+                                {details?.title?.english
+                                  ? details?.title?.english
+                                  : details?.title.romaji}{' '}
+                                episode {episode.number}
+                              </h1>
+                            }
+                          >
+                            <a href={`/watch/${episode.id}/${details.id}`}>
+                              <button
+                                onMouseEnter={() => handleMouseEnter(index + 1)}
+                                onMouseLeave={() => handleMouseLeave(index + 1)}
+                                disabled={index + 1 > details.currentEpisode}
+                                style={buttonStyle(index + 1)}
+                                className={`border rounded-lg hover:text-gray-200 p-2 transition-colors duration-[0.3s] mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3`}
+                              >
+                                Episode {index + 1}
+                              </button>{' '}
+                            </a>
+                          </Tooltip>
+                        )}
+                        {index + 1 === streamId && (
+                          <Tooltip
+                            title={`You're already watching this`}
+                            placement="top"
+                          >
                             <button
-                              onMouseEnter={() => handleMouseEnter(index + 1)}
-                              onMouseLeave={() => handleMouseLeave(index + 1)}
-                              disabled={index + 1 > details.currentEpisode}
-                              style={buttonStyle(index + 1)}
-                              className={`border rounded-lg hover:text-gray-200 p-2 transition-colors duration-[0.3s] mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3`}
+                              style={unhoverButtonStyle()}
+                              className="rounded-lg  cursor-not-allowed transition-colors duration-300 p-2 mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3"
                             >
                               Episode {index + 1}
                             </button>{' '}
-                          </a>
-                        </Tooltip>
-                      )}
-                      {index + 1 === streamId && (
-                        <Tooltip
-                          title={`You're already watching this`}
-                          placement="top"
-                        >
-                          <button
-                            style={unhoverButtonStyle()}
-                            className="rounded-lg  cursor-not-allowed transition-colors duration-300 p-2 mb-2 max-w-40 text-xs md:text-sm lg:text-[18px] lg:p-3"
-                          >
-                            Episode {index + 1}
-                          </button>{' '}
-                        </Tooltip>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
+                          </Tooltip>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
               </div>
+            </div>
+            <h1 className="mt-6 text-xl lg:text-4xl md:text-2xl sm:text-xl ">
+              Relations
+            </h1>
+            <div className="flex gap-3 mt-4">
+              {details?.relations.map((relation, value) => {
+                return (
+                  <a
+                    key={relation.id}
+                    href={`/details/${relation.id}`}
+                    className="cursor-pointer hover:scale-105 duration-300"
+                  >
+                    <Tooltip
+                      key={relation.id}
+                      title={
+                        <h1 className="text-xs">
+                          Watch {relation.title?.english}{' '}
+                          {relation.relationType}
+                        </h1>
+                      }
+                      placement="top"
+                    >
+                      <Image
+                        src={relation.image as string}
+                        alt={relation.title?.native as string}
+                        height={500}
+                        width={500}
+                        className="h-[150px] w-[90px] lg:h-[300px] lg:w-[150px] md:h-[250px] md:w-[100px] object-cover rounded-md select-none"
+                      />
+                    </Tooltip>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
