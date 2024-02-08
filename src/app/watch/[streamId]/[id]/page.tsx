@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
 import Image from 'next/image';
+import Footer from '@/components/footer';
 
 interface Anime {
   id: string;
@@ -337,6 +338,7 @@ export default function Watch({ params }: Readonly<Props>) {
               })}
             </div>
           </div>
+          <Footer />
         </div>
       ) : (
         <div>Loading...</div>

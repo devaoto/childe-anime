@@ -3,6 +3,7 @@ import NavBar from '@/components/navbar';
 import Recent from '@/components/recent';
 import Popular from '@/components/popular';
 import Random from '@/components/random';
+import Footer from '@/components/footer';
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Trending />
       <Random />
       <Recent />
+      <Footer />
     </div>
   );
 }

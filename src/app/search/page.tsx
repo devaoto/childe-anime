@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Image from 'next/image';
 import NavBar from '@/components/navbar';
 import { Pagination } from 'keep-react';
+import Footer from '@/components/footer';
 
 interface Anime {
   id?: string;
@@ -126,6 +127,7 @@ export default function Search() {
   return (
     <Suspense>
       <SearchComponent />
+      <Footer />
     </Suspense>
   );
 }
