@@ -140,18 +140,30 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                 >
                   <Popover
                     title={
-                      <h1>
-                        Information related to{' '}
+                      <h1 className="text-sm md:text-lg lg:text-xl xl:text-2xl">
+                        Information about{' '}
                         {anime.title?.english
                           ? anime.title.english
                           : anime.title?.romaji}
                       </h1>
                     }
                     content={
-                      <div>
-                        <p>Status {anime.status}</p>
-                        <p>Rating: {anime.rating}</p>
-                        <p>Released: {anime.releaseDate}</p>
+                      <div className="flex gap-2">
+                        <Image
+                          src={anime.image as string}
+                          alt={anime.title?.native as string}
+                          width={700}
+                          height={700}
+                          className="w-32 h-40"
+                        />
+                        <div className="text-sm md:text-lg lg:text-xl xl:text-2xl">
+                          <p>Status {anime.status}</p>
+                          <p>Rating: {anime.rating}</p>
+                          <p>Released: {anime.releaseDate}</p>
+                          <button className="bg-teal-500 text-white p-2 rounded-full text-lg">
+                            View details
+                          </button>
+                        </div>
                       </div>
                     }
                     trigger={'click'}
