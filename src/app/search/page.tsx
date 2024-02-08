@@ -37,7 +37,7 @@ function SearchComponent() {
 
         let url = `/api/anime/advanced-search?page=${currentPage}&perPage=20`;
         if (query) {
-          url += `&q=${query}`;
+          url += `&query=${query}`;
         }
         if (genres) {
           url += `&genres=${genres}`;
