@@ -137,6 +137,18 @@ interface Episode {
   url: string;
 }
 
+interface AnifyEpisodeDetail {
+  id: string;
+  number: number;
+  title: string;
+  isFiller: boolean;
+  img: string | null;
+  hasDub: boolean;
+  description: string | null;
+  rating: number | null;
+  updatedAt: number;
+}
+
 type Props = {
   params: { id: number };
 };
@@ -163,6 +175,8 @@ function darkenHexColor(hex: string, percent: number) {
 
 export default function Details({ params }: Readonly<Props>) {
   const [details, setDetails] = useState<Anime | null>(null);
+  const [episodes, setEpisodes] = useState<AnifyEpisodeDetail[] | null>(null);
+
   const [buttonHoverStates, setButtonHoverStates] = useState<{
     [key: string]: boolean;
   }>({});
@@ -182,6 +196,33 @@ export default function Details({ params }: Readonly<Props>) {
     };
 
     fetchData();
+  }, [params.id]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(
+        `https://api.anify.tv/episodes/${params.id}`
+      );
+
+      const results = await response.json();
+
+      const zoroProvider = results.find(
+        (provider: { providerId: string }) => provider.providerId === 'zoro'
+      );
+      const gogoProvider = results.find(
+        (provider: { providerId: string }) => provider.providerId === 'gogoanime'
+      )
+
+      if (zoroProvider) {
+        setEpisodes(zoroProvider?.episodes);
+      } else if(gogoProvider) {
+        setEpisodes(gogoProvider?.episodes)
+      } else {
+        return(
+          <div>No provider found.</div>
+        )
+      }
+    })();
   }, [params.id]);
 
   const handleMouseEnter = (index: number) => {
@@ -258,7 +299,9 @@ export default function Details({ params }: Readonly<Props>) {
               />
               <button
                 onClick={() =>
-                  (window.location.href = `/watch/${details.episodes[0].id}/${details.id}`)
+                  (window.location.href = `/watch/${encodeURIComponent(
+                    episodes?.[0].id as string
+                  )}/${details.id}/1`)
                 }
                 onMouseEnter={() => handleMouseEnter(99999)}
                 onMouseLeave={() => handleMouseLeave(99999)}
@@ -312,7 +355,7 @@ export default function Details({ params }: Readonly<Props>) {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
-            {details.episodes.map((episode, index) => (
+            {episodes?.map((episode, index) => (
               <div key={episode.id}>
                 <Tooltip
                   title={
@@ -328,7 +371,9 @@ export default function Details({ params }: Readonly<Props>) {
                 >
                   <a
                     key={episode.id}
-                    href={`/watch/${episode.id}/${details.id}`}
+                    href={`/watch/${encodeURIComponent(episode.id)}/${
+                      details.id
+                    }/${episode.number}`}
                   >
                     <button
                       onMouseEnter={() => handleMouseEnter(index)}
