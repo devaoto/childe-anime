@@ -210,17 +210,16 @@ export default function Details({ params }: Readonly<Props>) {
         (provider: { providerId: string }) => provider.providerId === 'zoro'
       );
       const gogoProvider = results.find(
-        (provider: { providerId: string }) => provider.providerId === 'gogoanime'
-      )
+        (provider: { providerId: string }) =>
+          provider.providerId === 'gogoanime'
+      );
 
       if (zoroProvider) {
         setEpisodes(zoroProvider?.episodes);
-      } else if(gogoProvider) {
-        setEpisodes(gogoProvider?.episodes)
+      } else if (gogoProvider) {
+        setEpisodes(gogoProvider?.episodes);
       } else {
-        return(
-          <div>No provider found.</div>
-        )
+        return <div>No provider found.</div>;
       }
     })();
   }, [params.id]);
@@ -270,7 +269,7 @@ export default function Details({ params }: Readonly<Props>) {
           ? darkenHexColor(details.color, 90)
           : '#000000',
       }}
-      className="h-screen"
+      className="h-auto"
     >
       {details ? (
         <>
