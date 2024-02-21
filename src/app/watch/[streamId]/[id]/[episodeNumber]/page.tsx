@@ -6,6 +6,7 @@ import Footer from '@/components/footer';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
+import axios from 'axios';
 
 import {
   AnifyEpisodeDetail,
@@ -187,6 +188,7 @@ export default function Watch({ params }: Readonly<Props>) {
 
   useEffect(() => {
     (async () => {
+      console.log('epLinks', episodeLinks);
       if (episodeLinks && episodeLinks?.sources && episodeLinks?.subtitles) {
         if (universalProvider === 'zoro') {
           const autoQualitySource = episodeLinks?.sources.find(
@@ -194,14 +196,10 @@ export default function Watch({ params }: Readonly<Props>) {
           );
 
           if (autoQualitySource) {
-            const result = await sendRequest(
-              `https://childe-anime-player.vercel.app/plyr/iframe`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            try {
+              const result = await axios.post(
+                `https://childe-anime-player.vercel.app/plyr/iframe`,
+                {
                   id: `${params.streamId}`,
                   video: {
                     type: 'video',
@@ -221,10 +219,18 @@ export default function Watch({ params }: Readonly<Props>) {
                       default: subtitle.lang === 'English',
                     })),
                   },
-                }),
-              }
-            );
-            setEncodedIframeData(`${result}`);
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                }
+              );
+
+              setEncodedIframeData(`${result.data}`);
+            } catch (error) {
+              console.error('Episode fetching error:', error);
+            }
           }
         } else {
           (async () => {
@@ -358,22 +364,25 @@ export default function Watch({ params }: Readonly<Props>) {
                 )
               ) : (
                 <>
-                  <div>Loading...</div>
-                  <iframe
-                    ref={(iframe) => {
-                      if (iframe) {
-                        iframe.contentDocument?.open();
-                        iframe.contentDocument?.write(encodedIframeData);
-                        iframe.contentDocument?.close();
-                      }
-                    }}
-                    scrolling="no"
-                    frameBorder="0"
-                    allowFullScreen={true}
-                    title={params.streamId}
-                    allow="autoplay; fullscreen; picture-in-picture; controls"
-                    className="w-full rounded-lg h-[50vh] lg:h-[75vh] md:h-[55vh]"
-                  />
+                  {encodedIframeData ? (
+                    <iframe
+                      ref={(iframe) => {
+                        if (iframe) {
+                          iframe.contentDocument?.open();
+                          iframe.contentDocument?.write(encodedIframeData);
+                          iframe.contentDocument?.close();
+                        }
+                      }}
+                      scrolling="no"
+                      frameBorder="0"
+                      allowFullScreen={true}
+                      title={params.streamId}
+                      allow="autoplay; fullscreen; picture-in-picture; controls"
+                      className="w-full rounded-lg h-[50vh] lg:h-[75vh] md:h-[55vh]"
+                    />
+                  ) : (
+                    <div>Loading player...</div>
+                  )}
                 </>
               )}
 
