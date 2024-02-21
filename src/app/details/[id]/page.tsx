@@ -5,149 +5,11 @@ import { Badge } from 'keep-react';
 import { Tooltip } from 'antd';
 import Footer from '@/components/footer';
 
-interface Anime {
-  id: string;
-  title: {
-    romaji: string;
-    english: string | null;
-    native: string;
-  };
-  malId: number;
-  synonyms: string[];
-  isLicensed: boolean;
-  isAdult: boolean;
-  countryOfOrigin: string;
-  trailer: {
-    id: string;
-    site: string;
-    thumbnail: string;
-    thumbnailHash: string;
-  };
-  image: string;
-  imageHash: string;
-  popularity: number;
-  color: string;
-  cover: string;
-  coverHash: string;
-  description: string;
-  status: string;
-  releaseDate: number;
-  startDate: {
-    year: number;
-    month: number;
-    day: number;
-  };
-  endDate: {
-    year: number;
-    month: number;
-    day: number;
-  };
-  totalEpisodes: number;
-  currentEpisode: number;
-  rating: number;
-  duration: number;
-  genres: string[];
-  season: string;
-  studios: string[];
-  subOrDub: string;
-  type: string;
-  recommendations: Recommendation[];
-  characters: Character[];
-  relations: Relation[];
-  episodes: Episode[];
-}
-
-interface Recommendation {
-  id: number;
-  malId: number;
-  title: {
-    romaji: string;
-    english: string;
-    native: string;
-    userPreferred: string;
-  };
-  status: string;
-  episodes: number;
-  image: string;
-  imageHash: string;
-  cover: string;
-  coverHash: string;
-  rating: number;
-  type: string;
-}
-
-interface Character {
-  id: number;
-  role: string;
-  name: {
-    first: string;
-    last: string | null;
-    full: string;
-    native: string;
-    userPreferred: string;
-  };
-  image: string;
-  imageHash: string;
-  voiceActors: VoiceActor[];
-}
-
-interface VoiceActor {
-  id: number;
-  language: string;
-  name: {
-    first: string;
-    last: string;
-    full: string;
-    native: string;
-    userPreferred: string;
-  };
-  image: string;
-  imageHash: string;
-}
-
-interface Relation {
-  id: number;
-  relationType: string;
-  malId: number;
-  title: {
-    romaji: string;
-    english: string;
-    native: string;
-    userPreferred: string;
-  };
-  status: string;
-  episodes: number | null;
-  image: string;
-  imageHash: string;
-  color: string;
-  type: string;
-  cover: string;
-  coverHash: string;
-  rating: number;
-}
-
-interface Episode {
-  id: string;
-  title: string | null;
-  image: string;
-  imageHash: string;
-  number: number;
-  createdAt: string | null;
-  description: string | null;
-  url: string;
-}
-
-interface AnifyEpisodeDetail {
-  id: string;
-  number: number;
-  title: string;
-  isFiller: boolean;
-  img: string | null;
-  hasDub: boolean;
-  description: string | null;
-  rating: number | null;
-  updatedAt: number;
-}
+import {
+  Anime,
+  AnifyEpisodeDetail,
+  AnimeAnilist,
+} from '@/lib/types/details.types';
 
 type Props = {
   params: { id: number };
@@ -174,7 +36,7 @@ function darkenHexColor(hex: string, percent: number) {
 }
 
 export default function Details({ params }: Readonly<Props>) {
-  const [details, setDetails] = useState<Anime | null>(null);
+  const [details, setDetails] = useState<Anime | AnimeAnilist | null>(null);
   const [episodes, setEpisodes] = useState<AnifyEpisodeDetail[] | null>(null);
 
   const [buttonHoverStates, setButtonHoverStates] = useState<{
@@ -184,14 +46,16 @@ export default function Details({ params }: Readonly<Props>) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const response = await fetch(`https://api.anify.tv/info/${params.id}`);
+        const data = await response.json();
+        setDetails(data);
+      } catch (error) {
         const response = await fetch(
           `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
         );
         const data = await response.json();
-        console.log('Result', data);
+
         setDetails(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
       }
     };
 
@@ -200,29 +64,47 @@ export default function Details({ params }: Readonly<Props>) {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch(
-        `https://api.anify.tv/episodes/${params.id}`
-      );
+      try {
+        const zoroProvider = (details as Anime).episodes.data.find(
+          (provider: { providerId: string }) => provider.providerId === 'zoro'
+        );
+        const gogoProvider = (details as Anime).episodes.data.find(
+          (provider: { providerId: string }) =>
+            provider.providerId === 'gogoanime'
+        );
 
-      const results = await response.json();
+        if (zoroProvider) {
+          setEpisodes(zoroProvider?.episodes);
+        } else if (gogoProvider) {
+          setEpisodes(gogoProvider?.episodes);
+        } else {
+          return <div>No provider found.</div>;
+        }
+      } catch (error) {
+        const response = await fetch(
+          `https://api.anify.tv/episodes/${params.id}`
+        );
 
-      const zoroProvider = results.find(
-        (provider: { providerId: string }) => provider.providerId === 'zoro'
-      );
-      const gogoProvider = results.find(
-        (provider: { providerId: string }) =>
-          provider.providerId === 'gogoanime'
-      );
+        const results = await response.json();
 
-      if (zoroProvider) {
-        setEpisodes(zoroProvider?.episodes);
-      } else if (gogoProvider) {
-        setEpisodes(gogoProvider?.episodes);
-      } else {
-        return <div>No provider found.</div>;
+        const zoroProvider = results.find(
+          (provider: { providerId: string }) => provider.providerId === 'zoro'
+        );
+        const gogoProvider = results.find(
+          (provider: { providerId: string }) =>
+            provider.providerId === 'gogoanime'
+        );
+
+        if (zoroProvider) {
+          setEpisodes(zoroProvider?.episodes);
+        } else if (gogoProvider) {
+          setEpisodes(gogoProvider?.episodes);
+        } else {
+          return <div>No provider found.</div>;
+        }
       }
     })();
-  }, [params.id]);
+  }, [params.id, details]);
 
   const handleMouseEnter = (index: number) => {
     setButtonHoverStates((prevState) => ({ ...prevState, [index]: true }));
@@ -232,9 +114,11 @@ export default function Details({ params }: Readonly<Props>) {
     setButtonHoverStates((prevState) => ({ ...prevState, [index]: false }));
   };
 
+  console.log('Details', details);
+
   const getColorTypeByGenre = (genre: string): string => {
     const colorTypes = ['gray', 'success', 'warning', 'error', 'info'];
-    const genreIndex = details?.genres.indexOf(genre);
+    const genreIndex = details?.genres?.indexOf(genre);
     return colorTypes[(genreIndex as number) % colorTypes.length];
   };
 
@@ -262,6 +146,13 @@ export default function Details({ params }: Readonly<Props>) {
     };
   };
 
+  useEffect(() => {
+    if (details) {
+      console.log('details.description type:', details?.description);
+      console.log('Result', details);
+    }
+  }, [details]);
+
   return (
     <div
       style={{
@@ -274,28 +165,28 @@ export default function Details({ params }: Readonly<Props>) {
       {details ? (
         <>
           <h1 className="text-xl lg:text-4xl md:text-2xl sm:text-xl mb-5">
-            {details.title.english}
+            {details.title?.english}
           </h1>
           <div className="flex gap-5">
             <Image
               className="rounded-md max-w-[150px] max-h-[200px] lg:max-w-[300] lg:max-h-[500] md:max-w-[250px] md:max-h-[350px] sm:max-w-[150px] sm:max-h-[250px]"
-              src={details.image}
-              alt={details.title.native}
+              src={
+                (details as Anime).coverImage
+                  ? (details as Anime).coverImage
+                  : (details as AnimeAnilist).image
+              }
+              alt={details.title?.native as string}
               width={300}
               height={500}
               objectFit="cover"
             />
             <div className="flex flex-col">
               <p
-                className={`${
-                  details.description.length >= 500 ? 'text-xs' : 'text-sm'
-                } md:${
-                  details.description.length >= 500 ? 'text-xs' : 'text-sm'
-                } lg:${
-                  details?.description.length >= 500 ? 'text-xl' : 'text-2xl'
-                }`}
-                dangerouslySetInnerHTML={{ __html: details.description }}
+                dangerouslySetInnerHTML={{
+                  __html: details.description,
+                }}
               />
+
               <button
                 onClick={() =>
                   (window.location.href = `/watch/${encodeURIComponent(
@@ -318,10 +209,10 @@ export default function Details({ params }: Readonly<Props>) {
             <div className="mt-2">
               {' '}
               <p className="text-sm md:text-xl lg:text-2xl">
-                Studio(s): {details.studios.join(', ')}
-              </p>
-              <p className="text-sm md:text-xl lg:text-2xl">
-                Rating: {details.rating}%
+                Rating:{' '}
+                {(details as Anime).rating.anilist
+                  ? `${(details as Anime).rating.anilist}/10`
+                  : `${(details as AnimeAnilist).rating}%`}
               </p>
               <p className="text-sm md:text-xl lg:text-2xl">
                 Season: {details.season}
@@ -330,7 +221,7 @@ export default function Details({ params }: Readonly<Props>) {
                 Status: {details.status}
               </p>
               <div className="flex flex-row gap-2 text-xl">
-                {details.genres.map((genre) => {
+                {details.genres?.map((genre) => {
                   const randomColorType = getColorTypeByGenre(genre);
                   return (
                     <Tooltip
@@ -354,38 +245,34 @@ export default function Details({ params }: Readonly<Props>) {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
-            {episodes?.map((episode, index) => (
-              <div key={episode.id}>
-                <Tooltip
-                  title={
-                    <h1 className="text-xs">
-                      Watch{' '}
-                      {details.title.english
-                        ? details.title?.english
-                        : details?.title.romaji}{' '}
-                      episode {index + 1}
-                    </h1>
-                  }
-                  placement="top"
-                >
-                  <a
-                    key={episode.id}
-                    href={`/watch/${encodeURIComponent(episode.id)}/${
-                      details.id
-                    }/${episode.number}`}
+            {episodes ? (
+              episodes?.map((episode, index) => (
+                <div key={episode.id}>
+                  <Tooltip
+                    title={<h1 className="text-xs">{episode.title}</h1>}
+                    placement="top"
                   >
-                    <button
-                      onMouseEnter={() => handleMouseEnter(index)}
-                      onMouseLeave={() => handleMouseLeave(index)}
-                      style={buttonStyle(index)}
-                      className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                    <a
+                      key={episode.id}
+                      href={`/watch/${encodeURIComponent(episode.id)}/${
+                        details.id
+                      }/${episode.number}`}
                     >
-                      Episode {index + 1}
-                    </button>
-                  </a>
-                </Tooltip>
-              </div>
-            ))}
+                      <button
+                        onMouseEnter={() => handleMouseEnter(index)}
+                        onMouseLeave={() => handleMouseLeave(index)}
+                        style={buttonStyle(index)}
+                        className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                      >
+                        Episode {index + 1}
+                      </button>
+                    </a>
+                  </Tooltip>
+                </div>
+              ))
+            ) : (
+              <div>Episode not found</div>
+            )}
           </div>
           <Footer />
         </>
