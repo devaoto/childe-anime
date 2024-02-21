@@ -41,6 +41,8 @@ export default function Watch({ params }: Readonly<Props>) {
     'vidcloud' | 'gogocdn' | null
   >(null);
   const [uniqueCharacters, setUniqueCharacters] = useState<any>({});
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isTab, setIsTab] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -252,6 +254,22 @@ export default function Watch({ params }: Readonly<Props>) {
     }
   }, [details]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobileDevice = window.innerWidth < 768;
+      const isTabletDevice =
+        window.innerWidth >= 768 && window.innerWidth < 1024;
+
+      setIsMobile(isMobileDevice);
+      setIsTab(isTabletDevice);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   function darkenHexColor(hex: string, percent: number) {
     percent = Math.min(100, Math.max(0, percent));
 
@@ -420,10 +438,10 @@ export default function Watch({ params }: Readonly<Props>) {
           </div>
           <div className="mt-10">
             <h1 className="text-2xl mb-5">Voice Actors</h1>
-            <div className="w-full flex flex-wrap flex-row gap-5">
+            <div className="w-full flex flex-wrap flex-row gap-7">
               <Swiper
-                slidesPerView={10}
-                spaceBetween={20}
+                slidesPerView={isMobile ? 2 : isTab ? 4 : 8}
+                spaceBetween={isMobile ? 40 : isTab ? 30 : 20}
                 modules={[Mousewheel]}
                 mousewheel={{
                   sensitivity: 50,
@@ -443,8 +461,8 @@ export default function Watch({ params }: Readonly<Props>) {
                           loading="lazy"
                           className="object-cover rounded-full max-h-32 max-w-32"
                         />
-                        <p className="text-sm font-semibold">{char.name}</p>
-                        <p className="text-xs font-semibold">
+                        <p className="text-xs font-semibold">{char.name}</p>
+                        <p className="text-[9px] font-semibold">
                           {char.voiceActor.name}
                         </p>
                       </div>
