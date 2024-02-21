@@ -11,7 +11,9 @@ export default function Home() {
   return (
     <div className="overflow-x-hidden">
       <div>
-        <NavBar />
+        <div className="z-[9999]">
+          <NavBar />
+        </div>
         <Popular />
         <Trending />
         <Random />
