@@ -163,21 +163,35 @@ export default function Watch({ params }: Readonly<Props>) {
               setData(result);
             }
           } catch (error) {
-            const episodesList = (details as AnimeAnilist)?.episodes;
+            try {
+              const episodesList = (details as AnimeAnilist)?.episodes;
 
-            console.log('params.episodeNumber', params.episodeNumber);
-            console.log('episodesList', episodesList);
+              console.log('params.episodeNumber', params.episodeNumber);
+              console.log('episodesList', episodesList);
 
-            const episodeSelected = episodesList?.find(
-              (episode) => episode.number === params.episodeNumber
-            );
-            if (episodeSelected) {
+              const episodeSelected = episodesList?.find(
+                (episode) => episode.number === params.episodeNumber
+              );
+              if (episodeSelected) {
+                const result = await sendRequest(
+                  `https://api.amvstr.me/api/v2/stream/${decodeURIComponent(
+                    episodeSelected?.id as string
+                  ).replace(/\//g, '')}`
+                );
+
+                setEpisodeLinks(null);
+                setUniProvider('gogoanime');
+                setUniServer('gogocdn');
+                setData(result);
+              }
+            } catch (error) {
+              const episodeId = params.streamId;
+
               const result = await sendRequest(
                 `https://api.amvstr.me/api/v2/stream/${decodeURIComponent(
-                  episodeSelected?.id as string
+                  episodeId
                 ).replace(/\//g, '')}`
               );
-
               setEpisodeLinks(null);
               setUniProvider('gogoanime');
               setUniServer('gogocdn');
@@ -356,7 +370,7 @@ export default function Watch({ params }: Readonly<Props>) {
             <div className="flex flex-col gap-2 lg:gap-20 lg:flex-row">
               <div className="w-full lg:w-2/4 md:w-3/4 sm:w-full">
                 {universalServer === 'gogocdn' ? (
-                  data.plyr.main ? (
+                  data?.plyr?.main ? (
                     <div>
                       <iframe
                         src={data?.plyr?.main || data?.plyr?.backup}
