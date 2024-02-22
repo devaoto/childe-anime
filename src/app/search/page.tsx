@@ -29,6 +29,7 @@ function SearchComponent() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState<string | null>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,16 +62,21 @@ function SearchComponent() {
     setCurrentPage(page);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div>
-      <NavBar searchValue={`${searchParams?.get('q')}`} />
+      <NavBar searchValue={searchQuery as string} />
       <h1 className="text-3xl mb-10 text-center">
         Search results for &quot;{searchParams?.get('q')}&quot;
       </h1>
       <div className="flex w-full items-center justify-center">
         <Input
           className="text-center font-semibold max-w-lg mb-8"
-          value={`${searchParams?.get('q')}`}
+          value={searchQuery as string}
+          onChange={handleInputChange}
         />
       </div>
       <div>
