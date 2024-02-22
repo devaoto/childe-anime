@@ -10,6 +10,7 @@ import {
   AnifyEpisodeDetail,
   AnimeAnilist,
 } from '@/lib/types/details.types';
+import { Episode } from '@/lib/types/watch.types';
 
 type Props = {
   params: { id: number };
@@ -37,7 +38,9 @@ function darkenHexColor(hex: string, percent: number) {
 
 export default function Details({ params }: Readonly<Props>) {
   const [details, setDetails] = useState<Anime | AnimeAnilist | null>(null);
-  const [episodes, setEpisodes] = useState<AnifyEpisodeDetail[] | null>(null);
+  const [episodes, setEpisodes] = useState<
+    AnifyEpisodeDetail[] | Episode[] | null
+  >(null);
 
   const [buttonHoverStates, setButtonHoverStates] = useState<{
     [key: string]: boolean;
@@ -81,26 +84,32 @@ export default function Details({ params }: Readonly<Props>) {
           return <div>No provider found.</div>;
         }
       } catch (error) {
-        const response = await fetch(
-          `https://api.anify.tv/episodes/${params.id}`
-        );
+        try {
+          const response = await fetch(
+            `https://api.anify.tv/episodes/${params.id}`
+          );
 
-        const results = await response.json();
+          const results = await response.json();
 
-        const zoroProvider = results.find(
-          (provider: { providerId: string }) => provider.providerId === 'zoro'
-        );
-        const gogoProvider = results.find(
-          (provider: { providerId: string }) =>
-            provider.providerId === 'gogoanime'
-        );
+          const zoroProvider = results.find(
+            (provider: { providerId: string }) => provider.providerId === 'zoro'
+          );
+          const gogoProvider = results.find(
+            (provider: { providerId: string }) =>
+              provider.providerId === 'gogoanime'
+          );
 
-        if (zoroProvider) {
-          setEpisodes(zoroProvider?.episodes);
-        } else if (gogoProvider) {
-          setEpisodes(gogoProvider?.episodes);
-        } else {
-          return <div>No provider found.</div>;
+          if (zoroProvider) {
+            setEpisodes(zoroProvider?.episodes);
+          } else if (gogoProvider) {
+            setEpisodes(gogoProvider?.episodes);
+          } else {
+            return <div>No provider found.</div>;
+          }
+        } catch (error) {
+          const episodes = (details as AnimeAnilist).episodes;
+
+          setEpisodes(episodes);
         }
       }
     })();
@@ -245,34 +254,55 @@ export default function Details({ params }: Readonly<Props>) {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4 max-h-[100px] max-w-[500px] overflow-y-auto">
-            {episodes ? (
-              episodes?.map((episode, index) => (
-                <div key={episode.id}>
-                  <Tooltip
-                    title={<h1 className="text-xs">{episode.title}</h1>}
-                    placement="top"
-                  >
-                    <a
-                      key={episode.id}
-                      href={`/watch/${encodeURIComponent(episode.id)}/${
-                        details.id
-                      }/${episode.number}`}
+            {(episodes as AnifyEpisodeDetail[])
+              ? (episodes as AnifyEpisodeDetail[])?.map((episode, index) => (
+                  <div key={episode.id}>
+                    <Tooltip
+                      title={<h1 className="text-xs">{episode.title}</h1>}
+                      placement="top"
                     >
-                      <button
-                        onMouseEnter={() => handleMouseEnter(index)}
-                        onMouseLeave={() => handleMouseLeave(index)}
-                        style={buttonStyle(index)}
-                        className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                      <a
+                        key={episode.id}
+                        href={`/watch/${encodeURIComponent(episode.id)}/${
+                          details.id
+                        }/${episode.number}`}
                       >
-                        Episode {index + 1}
-                      </button>
-                    </a>
-                  </Tooltip>
-                </div>
-              ))
-            ) : (
-              <div>Episode not found</div>
-            )}
+                        <button
+                          onMouseEnter={() => handleMouseEnter(index)}
+                          onMouseLeave={() => handleMouseLeave(index)}
+                          style={buttonStyle(index)}
+                          className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                        >
+                          Episode {index + 1}
+                        </button>
+                      </a>
+                    </Tooltip>
+                  </div>
+                ))
+              : (episodes as Episode[])?.map((episode, index) => (
+                  <div key={episode.id}>
+                    <Tooltip
+                      title={<h1 className="text-xs">{episode.title}</h1>}
+                      placement="top"
+                    >
+                      <a
+                        key={episode.id}
+                        href={`/watch/${encodeURIComponent(episode.id)}/${
+                          details.id
+                        }/${episode.number}`}
+                      >
+                        <button
+                          onMouseEnter={() => handleMouseEnter(index)}
+                          onMouseLeave={() => handleMouseLeave(index)}
+                          style={buttonStyle(index)}
+                          className="border rounded-lg p-2 hover:text-gray-200 transition-colors duration-[0.3s] max-w-32 text-xs md:text-sm lg:text-[18px] lg:p-3"
+                        >
+                          Episode {index + 1}
+                        </button>
+                      </a>
+                    </Tooltip>
+                  </div>
+                ))}
           </div>
           <Footer />
         </>
