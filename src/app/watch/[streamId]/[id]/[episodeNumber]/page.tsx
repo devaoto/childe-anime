@@ -44,6 +44,9 @@ export default function Watch({ params }: Readonly<Props>) {
   const [uniqueCharacters, setUniqueCharacters] = useState<any>({});
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isTab, setIsTab] = useState<boolean>(false);
+  const [currentEpisode, setCurrentEpisode] = useState<
+    AnifyEpisodeDetail | Episode | undefined | null
+  >(null);
 
   useEffect(() => {
     (async () => {
@@ -261,6 +264,16 @@ export default function Watch({ params }: Readonly<Props>) {
   }, [details]);
 
   useEffect(() => {
+    const episodeNumber = params.episodeNumber;
+
+    const currentEpisode = episodes?.find(
+      (episode) => episode.number === Number(episodeNumber)
+    );
+
+    setCurrentEpisode(currentEpisode);
+  }, [params.episodeNumber, episodes]);
+
+  useEffect(() => {
     const handleResize = () => {
       const isMobileDevice = window.innerWidth < 768;
       const isTabletDevice =
@@ -339,52 +352,57 @@ export default function Watch({ params }: Readonly<Props>) {
           className="h-auto"
         >
           <div className="ml-2">
-            <h1 className="lg:text-2xl md:text-base sm:text-sm mb-3">
-              Watching{' '}
-              <span className="font-semibold">
-                {details?.title?.english
-                  ? details.title.english
-                  : details?.title.romaji}
-              </span>
-            </h1>
-            <div className="flex flex-col gap-20 lg:flex-row">
-              {universalServer === 'gogocdn' ? (
-                data.plyr.main ? (
-                  <iframe
-                    src={data?.plyr?.main || data?.plyr?.backup}
-                    scrolling="no"
-                    frameBorder="0"
-                    allowFullScreen={true}
-                    title={params.streamId}
-                    allow="picture-in-picture"
-                    className="lg:w-2/4 md:w-3/4 sm:w-full rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh]"
-                  ></iframe>
-                ) : (
-                  <div>Loading...</div>
-                )
-              ) : (
-                <>
-                  {encodedIframeData ? (
-                    <iframe
-                      ref={(iframe) => {
-                        if (iframe) {
-                          iframe.contentDocument?.open();
-                          iframe.contentDocument?.write(encodedIframeData);
-                          iframe.contentDocument?.close();
-                        }
-                      }}
-                      scrolling="no"
-                      frameBorder="0"
-                      allowFullScreen={true}
-                      title={params.streamId}
-                      allow="autoplay; fullscreen; picture-in-picture; controls"
-                      className="w-full rounded-lg h-[50vh] lg:h-[75vh] md:h-[55vh]"
-                    />
+            <div className="mb-2"></div>
+            <div className="flex flex-col gap-2 lg:gap-20 lg:flex-row">
+              <div className="w-full lg:w-2/4 md:w-3/4 sm:w-full">
+                {universalServer === 'gogocdn' ? (
+                  data.plyr.main ? (
+                    <div>
+                      <iframe
+                        src={data?.plyr?.main || data?.plyr?.backup}
+                        scrolling="no"
+                        frameBorder="0"
+                        allowFullScreen={true}
+                        title={params.streamId}
+                        allow="picture-in-picture"
+                        className="rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh] w-full"
+                      ></iframe>
+                      <h1 className="font-semibold">
+                        {details.title.english} - {currentEpisode?.title}
+                      </h1>
+                    </div>
                   ) : (
-                    <div>Loading player...</div>
-                  )}
-                </>
-              )}
+                    <div>Loading...</div>
+                  )
+                ) : (
+                  <>
+                    {encodedIframeData ? (
+                      <div>
+                        <iframe
+                          ref={(iframe) => {
+                            if (iframe) {
+                              iframe.contentDocument?.open();
+                              iframe.contentDocument?.write(encodedIframeData);
+                              iframe.contentDocument?.close();
+                            }
+                          }}
+                          scrolling="no"
+                          frameBorder="0"
+                          allowFullScreen={true}
+                          title={params.streamId}
+                          allow="autoplay; fullscreen; picture-in-picture; controls"
+                          className="rounded-lg h-[50vh] lg:h-[60vh] md:h-[55vh] w-full mb-0 pb-0"
+                        />
+                        <h1 className="font-semibold lg:text-2xl md:text-xl ml-2 mt-0 pt-0">
+                          {details.title.english} - {currentEpisode?.title}
+                        </h1>
+                      </div>
+                    ) : (
+                      <div>Loading player...</div>
+                    )}
+                  </>
+                )}
+              </div>
 
               <div className="flex flex-wrap gap-2 mt-4 max-h-[360px] max-w-[500px] overflow-y-auto">
                 <div className="">
