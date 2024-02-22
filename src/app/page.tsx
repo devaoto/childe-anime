@@ -11,26 +11,27 @@ export default function Home() {
   return (
     <div className="overflow-x-hidden">
       <div>
-        <div className="relative z-[9999]">
+        <div className="relative z-[2000]">
           <NavBar />
         </div>
         <Popular />
         <Trending />
-        <Random />
+        <div className="relative z-[2000]">
+          <Random />
+        </div>
         <Recent />
         <Footer />
-      </div>
-      <Meteors number={3} />
-      <div className="w-full absolute inset-0 h-full">
-        <SparklesCore
-          id="tsparticlesfullpage"
-          background="transparent"
-          minSize={0.6}
-          maxSize={1.4}
-          particleDensity={100}
-          className="w-full h-full"
-          particleColor="#008080"
-        />
+        <div className="w-auto absolute inset-0 h-full">
+          <SparklesCore
+            id="tsparticlesfullpage"
+            background="transparent"
+            minSize={0.6}
+            maxSize={1.4}
+            particleDensity={100}
+            className="w-auto h-full"
+            particleColor="#008080"
+          />
+        </div>
       </div>
     </div>
   );

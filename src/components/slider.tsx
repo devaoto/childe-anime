@@ -45,12 +45,14 @@ interface SwiperComponentProps {
   animeList: Anime[];
   isMobile: boolean;
   includeEpisodeList?: boolean;
+  popoverPlacement?: 'top' | 'bottom';
 }
 
 const SwiperComponent: React.FC<SwiperComponentProps> = ({
   animeList,
   isMobile,
   includeEpisodeList = true,
+  popoverPlacement = 'top',
 }) => {
   const router = useRouter();
   const [tooltipVisible, setTooltipVisible] = useState<boolean[]>(
@@ -83,6 +85,11 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
           <div>
             <p className="text-white">Total Episodes: {anime.totalEpisodes}</p>
             <p className="text-white">Rating: {anime.rating}%</p>
+            <a href={`/details/${anime.id}`}>
+              <button className="bg-teal-500 text-white p-2 rounded-full text-[12px]">
+                Details
+              </button>
+            </a>
           </div>
         );
 
@@ -113,8 +120,9 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                         </h1>
                       }
                       content={content}
-                      placement="top"
+                      placement={popoverPlacement}
                       visible={tooltipVisible[index]}
+                      className="z-[9999]"
                     >
                       <Image
                         src={anime.image as string}
@@ -122,8 +130,7 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                         width={500}
                         height={500}
                         objectFit="cover"
-                        className="h-auto w-full object-cover select-none"
-                        style={{ height: 200, width: 600 }}
+                        className="h-auto w-full object-cover select-none max-h-[81px] rounded-md"
                       />
                     </Popover>
                   </ConfigProvider>
@@ -139,6 +146,8 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                   }}
                 >
                   <Popover
+                    placement={popoverPlacement}
+                    className="z-[9999]"
                     title={
                       <h1 className="text-sm md:text-lg lg:text-xl xl:text-2xl">
                         Information about{' '}
@@ -160,9 +169,11 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                           <p>Status {anime.status}</p>
                           <p>Rating: {anime.rating}</p>
                           <p>Released: {anime.releaseDate}</p>
-                          <button className="bg-teal-500 text-white p-2 rounded-full text-lg">
-                            View details
-                          </button>
+                          <a href={`/details/${anime.id}`}>
+                            <button className="bg-teal-500 text-white p-2 rounded-full text-[12px]">
+                              Details
+                            </button>
+                          </a>
                         </div>
                       </div>
                     }

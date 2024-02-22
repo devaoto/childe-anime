@@ -78,6 +78,7 @@ export default function Popular() {
           <SwiperComponent
             animeList={popularList.results || []}
             isMobile={isMobile}
+            popoverPlacement='bottom'
           />
         </div>
       ) : (
