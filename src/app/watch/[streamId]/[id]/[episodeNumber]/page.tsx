@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Tooltip } from 'antd';
 import Footer from '@/components/footer';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -48,6 +48,7 @@ export default function Watch({ params }: Readonly<Props>) {
   const [currentEpisode, setCurrentEpisode] = useState<
     AnifyEpisodeDetail | Episode | undefined | null
   >(null);
+  const iframeRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -304,6 +305,19 @@ export default function Watch({ params }: Readonly<Props>) {
     };
   }, []);
 
+  useEffect(() => {
+    const iframe = iframeRef.current;
+
+    if (iframe) {
+      const contentDocument = (iframe as HTMLIFrameElement).contentDocument;
+      if (contentDocument) {
+        contentDocument.open();
+        contentDocument.write(encodedIframeData);
+        contentDocument.close();
+      }
+    }
+  }, [encodedIframeData]);
+
   function darkenHexColor(hex: string, percent: number) {
     percent = Math.min(100, Math.max(0, percent));
 
@@ -406,13 +420,7 @@ export default function Watch({ params }: Readonly<Props>) {
                     {encodedIframeData ? (
                       <div>
                         <iframe
-                          ref={(iframe) => {
-                            if (iframe) {
-                              iframe.contentDocument?.open();
-                              iframe.contentDocument?.write(encodedIframeData);
-                              iframe.contentDocument?.close();
-                            }
-                          }}
+                          ref={iframeRef}
                           scrolling="no"
                           frameBorder="0"
                           allowFullScreen={true}
