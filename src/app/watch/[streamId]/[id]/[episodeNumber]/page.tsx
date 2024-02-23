@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import axios from 'axios';
+import { NextSeo } from 'next-seo';
 
 import {
   AnifyEpisodeDetail,
@@ -365,6 +366,18 @@ export default function Watch({ params }: Readonly<Props>) {
           }}
           className="h-auto"
         >
+          <NextSeo
+            title={
+              details?.title.english
+                ? details?.title.english
+                : details?.title.romaji
+            }
+            description={`Watch ${
+              details?.title.english
+                ? details?.title.english
+                : details?.title.romaji
+            } on Childe anime for free without any ads`}
+          />
           <div className="ml-2">
             <div className="mb-2"></div>
             <div className="flex flex-col gap-2 lg:gap-20 lg:flex-row">
