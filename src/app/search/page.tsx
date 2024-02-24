@@ -6,6 +6,7 @@ import Image from 'next/image';
 import NavBar from '@/components/navbar';
 import { Pagination } from 'keep-react';
 import Footer from '@/components/footer';
+import { encodeIds } from '@/lib/functions/encode';
 
 interface Anime {
   id?: string;
@@ -86,7 +87,12 @@ function SearchComponent() {
               return (
                 <a
                   key={anime.id}
-                  href={`/details/${anime.id}`}
+                  href={`/details/${encodeURIComponent(
+                    encodeIds(
+                      Number(anime.id),
+                      process.env.NEXT_PUBLIC_SECRET_KEY as string
+                    )
+                  )}`}
                   className="cursor-pointer hover:scale-105 duration-300"
                 >
                   <Tooltip
