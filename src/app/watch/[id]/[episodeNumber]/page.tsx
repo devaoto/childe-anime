@@ -17,6 +17,7 @@ import {
 } from '@/lib/types/watch.types';
 import { sendRequest } from '@/lib/utils/request';
 import { AnimeAnilist, Anime } from '@/lib/types/details.types';
+import { encodeIds } from '@/lib/functions/encode';
 
 type Props = {
   params: {
@@ -458,19 +459,16 @@ export default function Watch({ params }: Readonly<Props>) {
                         {episode.number !== params.episodeNumber && (
                           <Tooltip
                             placement="top"
-                            title={
-                              <h1 className="text-xs">
-                                {details?.title?.english
-                                  ? details?.title?.english
-                                  : details?.title.romaji}{' '}
-                                episode {episode.number}
-                              </h1>
-                            }
+                            title={<h1 className="text-xs">{episode.title}</h1>}
                           >
                             <a
-                              href={`/watch/${encodeURIComponent(episode.id)}/${
-                                details.id
-                              }/${episode.number}`}
+                              href={`/watch/${encodeURIComponent(
+                                encodeIds(
+                                  Number(details.id),
+                                  process.env.NEXT_PUBLIC_SECRET_KEY as string,
+                                  encodeURIComponent(episode.id)
+                                )
+                              )}/${episode.number}`}
                             >
                               <button
                                 onMouseEnter={() =>
