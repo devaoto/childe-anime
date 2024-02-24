@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Badge } from 'keep-react';
 import { Tooltip } from 'antd';
 import Footer from '@/components/footer';
+import { decodeIds } from '@/lib/functions/decode';
+import { encodeIds } from '@/lib/functions/encode';
 
 import {
   Anime,
@@ -13,7 +15,7 @@ import {
 import { Episode } from '@/lib/types/watch.types';
 
 type Props = {
-  params: { id: number };
+  params: { id: string };
 };
 
 function darkenHexColor(hex: string, percent: number) {
@@ -46,15 +48,22 @@ export default function Details({ params }: Readonly<Props>) {
     [key: string]: boolean;
   }>({});
 
+  const decodedId = decodeIds(
+    decodeURIComponent(params.id),
+    process.env.NEXT_PUBLIC_SECRET_KEY as string
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`https://api.anify.tv/info/${params.id}`);
+        const response = await fetch(
+          `https://api.anify.tv/info/${decodedId?.id}`
+        );
         const data = await response.json();
         setDetails(data);
       } catch (error) {
         const response = await fetch(
-          `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
+          `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${decodedId?.id}`
         );
         const data = await response.json();
 
@@ -63,7 +72,7 @@ export default function Details({ params }: Readonly<Props>) {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [decodedId?.id]);
 
   useEffect(() => {
     (async () => {
@@ -86,7 +95,7 @@ export default function Details({ params }: Readonly<Props>) {
       } catch (error) {
         try {
           const response = await fetch(
-            `https://api.anify.tv/episodes/${params.id}`
+            `https://api.anify.tv/episodes/${decodedId?.id}`
           );
 
           const results = await response.json();
@@ -113,7 +122,7 @@ export default function Details({ params }: Readonly<Props>) {
         }
       }
     })();
-  }, [params.id, details]);
+  }, [decodedId?.id, details]);
 
   const handleMouseEnter = (index: number) => {
     setButtonHoverStates((prevState) => ({ ...prevState, [index]: true }));
@@ -155,13 +164,6 @@ export default function Details({ params }: Readonly<Props>) {
     };
   };
 
-  useEffect(() => {
-    if (details) {
-      console.log('details.description type:', details?.description);
-      console.log('Result', details);
-    }
-  }, [details]);
-
   return (
     <div
       style={{
@@ -199,8 +201,12 @@ export default function Details({ params }: Readonly<Props>) {
               <button
                 onClick={() =>
                   (window.location.href = `/watch/${encodeURIComponent(
-                    episodes?.[0].id as string
-                  )}/${details.id}/1`)
+                    encodeIds(
+                      Number(details.id),
+                      process.env.NEXT_PUBLIC_SECRET_KEY as string,
+                      encodeURIComponent(episodes?.[0].id as string)
+                    )
+                  )}/1`)
                 }
                 onMouseEnter={() => handleMouseEnter(99999)}
                 onMouseLeave={() => handleMouseLeave(99999)}
@@ -263,9 +269,13 @@ export default function Details({ params }: Readonly<Props>) {
                     >
                       <a
                         key={episode.id}
-                        href={`/watch/${encodeURIComponent(episode.id)}/${
-                          details.id
-                        }/${episode.number}`}
+                        href={`/watch/${encodeURIComponent(
+                          encodeIds(
+                            Number(details.id),
+                            process.env.NEXT_PUBLIC_SECRET_KEY as string,
+                            encodeURIComponent(episode.id)
+                          )
+                        )}/${episode.number}`}
                       >
                         <button
                           onMouseEnter={() => handleMouseEnter(index)}
@@ -287,9 +297,13 @@ export default function Details({ params }: Readonly<Props>) {
                     >
                       <a
                         key={episode.id}
-                        href={`/watch/${encodeURIComponent(episode.id)}/${
-                          details.id
-                        }/${episode.number}`}
+                        href={`/watch/${encodeURIComponent(
+                          encodeIds(
+                            Number(details.id),
+                            process.env.NEXT_PUBLIC_SECRET_KEY as string,
+                            encodeURIComponent(episode.id)
+                          )
+                        )}/${episode.number}`}
                       >
                         <button
                           onMouseEnter={() => handleMouseEnter(index)}

@@ -7,6 +7,7 @@ import { ConfigProvider, Popover } from 'antd';
 import Image from 'next/image';
 import { Card } from 'keep-react';
 import { useRouter } from 'next/navigation';
+import { encodeIds } from '@/lib/functions/encode';
 
 interface Anime {
   id?: string;
@@ -61,7 +62,14 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
 
   const handleCardClick = (animeId: string, index: number) => {
     if (tooltipVisible[index]) {
-      router.push(`/details/${animeId}`);
+      router.push(
+        `/details/${encodeURIComponent(
+          encodeIds(
+            Number(animeId),
+            process.env.NEXT_PUBLIC_SECRET_KEY as string
+          )
+        )}`
+      );
     } else {
       const updatedTooltipVisible = [...tooltipVisible];
       updatedTooltipVisible.fill(false);
@@ -169,7 +177,12 @@ const SwiperComponent: React.FC<SwiperComponentProps> = ({
                           <p>Status {anime.status}</p>
                           <p>Rating: {anime.rating}</p>
                           <p>Released: {anime.releaseDate}</p>
-                          <a href={`/details/${anime.id}`}>
+                          <a
+                            href={`/details/${encodeIds(
+                              Number(anime.id),
+                              process.env.NEXT_PUBLIC_SECRET_KEY as string
+                            )}`}
+                          >
                             <button className="bg-teal-500 text-white p-2 rounded-full text-[12px]">
                               Details
                             </button>

@@ -8,6 +8,7 @@ import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import axios from 'axios';
 import { NextSeo } from 'next-seo';
+import { decodeIds } from '@/lib/functions/decode';
 
 import {
   AnifyEpisodeDetail,
@@ -19,8 +20,7 @@ import { AnimeAnilist, Anime } from '@/lib/types/details.types';
 
 type Props = {
   params: {
-    streamId: string;
-    id: number;
+    id: string;
     episodeNumber: number;
   };
 };
@@ -50,22 +50,30 @@ export default function Watch({ params }: Readonly<Props>) {
   >(null);
   const iframeRef = useRef(null);
 
+  const decodedId = decodeIds(
+    decodeURIComponent(params.id),
+    process.env.NEXT_PUBLIC_SECRET_KEY as string
+  );
+
+  const slug = decodedId?.slug;
+  const id = decodedId?.id;
+
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`https://api.anify.tv/info/${params.id}`);
+        const response = await fetch(`https://api.anify.tv/info/${id}`);
         const data = await response.json();
         setDetails(data);
       } catch (error) {
         const response = await fetch(
-          `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${params.id}`
+          `https://consumet-api-h1ga.onrender.com/meta/anilist/info/${id}`
         );
         const data = await response.json();
 
         setDetails(data);
       }
     })();
-  }, [params.id]);
+  }, [id]);
   useEffect(() => {
     (async () => {
       try {
@@ -85,9 +93,7 @@ export default function Watch({ params }: Readonly<Props>) {
           return <div>No provider found.</div>;
         }
       } catch (error) {
-        const response = await fetch(
-          `https://api.anify.tv/episodes/${params.id}`
-        );
+        const response = await fetch(`https://api.anify.tv/episodes/${id}`);
 
         const results = await response.json();
 
@@ -108,12 +114,16 @@ export default function Watch({ params }: Readonly<Props>) {
         }
       }
     })();
-  }, [params.id, details]);
+  }, [id, details]);
 
   useEffect(() => {
     let provider;
     let server;
-    if (decodeURIComponent(params.streamId).split('/').includes('watch')) {
+    if (
+      decodeURIComponent(slug as string)
+        .split('/')
+        .includes('watch')
+    ) {
       provider = 'zoro';
       server = 'vidcloud';
     } else {
@@ -125,9 +135,9 @@ export default function Watch({ params }: Readonly<Props>) {
       try {
         setUniProvider(provider as 'gogoanime' | 'zoro');
         setUniServer(server as 'gogocdn' | 'vidcloud');
-        const streamId = params.streamId;
+        const streamId = slug;
         const episodes = await sendRequest(
-          `https://api.anify.tv/sources?providerId=${provider}&watchId=${streamId}&episodeNumber=${params.episodeNumber}&id=${params.id}&subType=sub&server=${server}`
+          `https://api.anify.tv/sources?providerId=${provider}&watchId=${streamId}&episodeNumber=${params.episodeNumber}&id=${id}&subType=sub&server=${server}`
         );
 
         setEpisodeLinks(episodes);
@@ -187,11 +197,11 @@ export default function Watch({ params }: Readonly<Props>) {
                 setData(result);
               }
             } catch (error) {
-              const episodeId = params.streamId;
+              const episodeId = slug;
 
               const result = await sendRequest(
                 `https://api.amvstr.me/api/v2/stream/${decodeURIComponent(
-                  episodeId
+                  episodeId as string
                 ).replace(/\//g, '')}`
               );
               setEpisodeLinks(null);
@@ -203,7 +213,7 @@ export default function Watch({ params }: Readonly<Props>) {
         }
       }
     })();
-  }, [params.streamId, params.id, params.episodeNumber, details]);
+  }, [slug, id, params.episodeNumber, details]);
 
   useEffect(() => {
     (async () => {
@@ -219,7 +229,7 @@ export default function Watch({ params }: Readonly<Props>) {
               const result = await axios.post(
                 `https://childe-anime-player.vercel.app/plyr/iframe`,
                 {
-                  id: `${params.streamId}`,
+                  id: `${slug}`,
                   video: {
                     type: 'video',
                     title: `${details?.title?.english}`,
@@ -255,7 +265,7 @@ export default function Watch({ params }: Readonly<Props>) {
           (async () => {
             const result = await sendRequest(
               `https://api.amvstr.me/api/v2/stream/${decodeURIComponent(
-                params.streamId
+                slug as string
               ).replace(/\//g, '')}`
             );
             setData(result);
@@ -263,7 +273,7 @@ export default function Watch({ params }: Readonly<Props>) {
         }
       }
     })();
-  }, [details, episodeLinks, params.streamId, universalProvider]);
+  }, [details, episodeLinks, slug, universalProvider]);
 
   useEffect(() => {
     if (details && (details as Anime).characters) {
@@ -404,7 +414,7 @@ export default function Watch({ params }: Readonly<Props>) {
                         scrolling="no"
                         frameBorder="0"
                         allowFullScreen={true}
-                        title={params.streamId}
+                        title={currentEpisode?.title as string}
                         allow="picture-in-picture"
                         className="rounded-lg h-[30vh] lg:h-[50vh] md:h-[30vh] w-full"
                       ></iframe>
@@ -424,7 +434,7 @@ export default function Watch({ params }: Readonly<Props>) {
                           scrolling="no"
                           frameBorder="0"
                           allowFullScreen={true}
-                          title={params.streamId}
+                          title={details.title.english as string}
                           allow="autoplay; fullscreen; picture-in-picture; controls"
                           className="rounded-lg h-[50vh] lg:h-[60vh] md:h-[55vh] w-full mb-0 pb-0"
                         />
