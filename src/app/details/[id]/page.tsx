@@ -10,7 +10,7 @@ import { encodeIds } from '@/lib/functions/encode';
 import {
   Anime,
   AnifyEpisodeDetail,
-  AnimeAnilist,
+  AnimeAnilist
 } from '@/lib/types/details.types';
 import { Episode } from '@/lib/types/watch.types';
 
