@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils/cn';
 
 export const Meteors = ({
   number,
-  className,
+  className
 }: {
   number?: number;
   className?: string;
