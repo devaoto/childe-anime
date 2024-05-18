@@ -68,7 +68,7 @@ export default function Popular() {
     return () => {
       window.removeEventListener('resize', checkIsMobile);
     };
-  }, []);
+  }, [])
 
   return (
     <div id="popular">
